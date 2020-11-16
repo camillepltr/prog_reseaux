@@ -46,7 +46,12 @@ public class EchoClient {
         final String PSEUDO = stdIn.readLine();
         String emittedMessage = "";
         
-        byte[] buf;
+        String firstMessageToServer = "First Connexion";
+        byte[] buf = firstMessageToServer.getBytes();
+        
+        // Send a datagram packet destined for the server
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, SERVER_ADDRESS, SERVER_PORT);
+        clientSocket.send(packet);
         
         // Launch reception thread
         ReceptionMessageClientThread reception = new ReceptionMessageClientThread(clientSocket, PSEUDO, GROUP_ADDRESS);
@@ -63,7 +68,7 @@ public class EchoClient {
             buf = emittedMessage.getBytes();
             
             // Send a datagram packet destined for the server
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, SERVER_ADDRESS, SERVER_PORT);
+            packet = new DatagramPacket(buf, buf.length, SERVER_ADDRESS, SERVER_PORT);
             clientSocket.send(packet);
         }
 

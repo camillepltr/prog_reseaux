@@ -12,6 +12,7 @@ package stream_udp;
 
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
 
 public class EchoServerMultiThreaded  {
   
@@ -25,6 +26,7 @@ public class EchoServerMultiThreaded  {
         
         System.out.println("Server Launched");
         final int SERVER_PORT = 3500;
+        LinkedList<DatagramPacket> history = new LinkedList<DatagramPacket>();
         
         try {
             // Group's Parameters 
@@ -39,20 +41,37 @@ public class EchoServerMultiThreaded  {
 
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 serverSocket.receive(packet);
+                System.out.println("A packet has been received.");
                 
                 int groupPort = packet.getPort();
-                System.out.println("A packet has been received from port "+groupPort+".");
+                InetAddress clientAddress = packet.getAddress();
                 
-                DatagramPacket packet_response = new DatagramPacket(buf, buf.length, GROUP_ADDRESS, groupPort);
+                String message = new String(packet.getData());
+                if (message.startsWith("First Connexion")){
+                    for (DatagramPacket previousPacket : history){
+                        sendMessage(serverSocket, previousPacket, clientAddress, groupPort);
+                    }
+
+                } else {
+                    history.add(packet);
+                    sendMessage(serverSocket, packet, GROUP_ADDRESS, groupPort);
+                }
                 
-                // Send a response
-                serverSocket.send(packet_response); 
             }
         } catch (Exception e) {
             System.err.println("Error in EchoServerMultiThreaded:" + e);
         }
     }
+    
+    private static void sendMessage(MulticastSocket serverSocket, DatagramPacket packet, InetAddress address, int port){
+        DatagramPacket packet_response = new DatagramPacket(packet.getData(), packet.getLength(), address, port);
+        try {
+            serverSocket.send(packet_response); 
+        } catch (Exception e) {
+            System.err.println("Error in EchoServerMultiThreaded:" + e);
+        }
+    }
 
-  }
+}
 
   

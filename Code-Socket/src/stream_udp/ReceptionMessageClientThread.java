@@ -12,7 +12,6 @@ package stream_udp;
 
 import java.io.*;
 import java.net.*;
-import java.util.LinkedList;
 
 public class ReceptionMessageClientThread extends Thread {
 	
@@ -54,7 +53,7 @@ public class ReceptionMessageClientThread extends Thread {
 
     		}
             clientSocket.leaveGroup(this.GROUP_ADDRESS);
-            clientSocket.close();
+            //clientSocket.close();
 
     	} catch (Exception e) {
         	System.err.println("Error in ReceptionClientThread:" + e); 
