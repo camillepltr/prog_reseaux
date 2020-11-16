@@ -19,7 +19,7 @@ public class ReceptionMessageClientThread extends Thread {
 	private MulticastSocket clientSocket;
     private final String PSEUDO;
     private final InetAddress GROUP_ADDRESS;
-	
+    
     /**
      * Constructor
      * @param initialSocket client's socket 
@@ -35,24 +35,24 @@ public class ReceptionMessageClientThread extends Thread {
  	/**
     * Main Method :
     *   - receives every messages for the client from his group
-    * @Exception
+    * @exception
     */
 	public void run() {
         try {
-             
-            String received_message = "";
-    		while (!received_message.equals(this.PSEUDO+" left.")) {
+            String receivedMessage = "";
+            
+    		while (!receivedMessage.startsWith(this.PSEUDO+" left.")) {
                 
-                byte[] buf = new byte[1000];
+                byte[] buf = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 
                 // Receive response
                 clientSocket.receive(packet);
-                received_message = new String(packet.getData());
-                System.out.println(received_message);
+                receivedMessage = new String(packet.getData(), packet.getOffset(), packet.getLength());
+
+                System.out.println(receivedMessage);
 
     		}
-            System.out.println("FINI RECEPTION");
             clientSocket.leaveGroup(this.GROUP_ADDRESS);
             clientSocket.close();
 

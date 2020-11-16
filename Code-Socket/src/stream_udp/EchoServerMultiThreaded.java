@@ -1,8 +1,11 @@
-/***
- * EchoServer
- * Example of a TCP server
- * Date: 10/01/04
- * Authors:
+/**
+ * EchoServerMultiThreaded
+ * A server connects with client and transfers messages
+ * This class :
+ * - connects the client to the server using the UDP Protocol.
+ * - transfers messages from a client to the rest of his group
+ * @since 16/11/2021
+ * @author Camille Peltier, Camélia Guerraoui
  */
 
 package stream_udp;
@@ -13,32 +16,37 @@ import java.net.*;
 public class EchoServerMultiThreaded  {
   
  	/**
-  	* main method
-	* @param EchoServer port
-  	* 
+  	* Main Method :
+    *   - connects the client to the server using the UDP Protocol.
+    *   - transfers messages from a client to the rest of his group
+    * @exception
   	**/
     public static void main(String args[]){ 
         
-        int port = 3500;
+        System.out.println("Server Launched");
+        final int SERVER_PORT = 3500;
         
         try {
-            MulticastSocket serverSock = new MulticastSocket(port);
+            // Group's Parameters 
+            final String GROUP_NAME = "228.5.6.7";
+            final InetAddress GROUP_ADDRESS = InetAddress.getByName(GROUP_NAME);
+            
+            MulticastSocket serverSocket = new MulticastSocket(SERVER_PORT);
             
             while (true) {
-                System.out.println("Waiting for client packet... ");
-                byte[] buf = new byte[1000];
+                
+                byte[] buf = new byte[256];
 
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                serverSock.receive(packet);
+                serverSocket.receive(packet);
                 
-                InetAddress groupAddress = InetAddress.getByName("228.5.6.7");
                 int groupPort = packet.getPort();
+                System.out.println("A packet has been received from port "+groupPort+".");
                 
-                // Build a datagram packet for response
-                DatagramPacket packet_response = new DatagramPacket(buf, buf.length, groupAddress, groupPort);
+                DatagramPacket packet_response = new DatagramPacket(buf, buf.length, GROUP_ADDRESS, groupPort);
                 
                 // Send a response
-                serverSock.send(packet_response); 
+                serverSocket.send(packet_response); 
             }
         } catch (Exception e) {
             System.err.println("Error in EchoServerMultiThreaded:" + e);

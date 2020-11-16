@@ -23,8 +23,8 @@ public class EchoClient {
     *   - connects the client to the server using the UDP Protocol.
     *   - launchs a parallel reception thread
     *   - emits every messages to the server.
-    * @Exception
-    * @See ReceptionMessageClientThread
+    * @exception
+    * @see ReceptionMessageClientThread
     */
     public static void main(String[] args) throws IOException {
         // Server's Parameters 
@@ -44,22 +44,23 @@ public class EchoClient {
         
         System.out.println("What's your pseudo?");
         final String PSEUDO = stdIn.readLine();
-        String emitted_message = "";
+        String emittedMessage = "";
+        
+        byte[] buf;
         
         // Launch reception thread
         ReceptionMessageClientThread reception = new ReceptionMessageClientThread(clientSocket, PSEUDO, GROUP_ADDRESS);
         reception.start();
         
-        while(!emitted_message.equals(PSEUDO+" left.")){
+        while(!emittedMessage.equals(PSEUDO+" left.")){
 
             // Build a message to emit
-            emitted_message = PSEUDO + " : " + stdIn.readLine();
-            if (emitted_message.equals(PSEUDO+" : .")){
-                emitted_message = PSEUDO+" left.";
+            emittedMessage = PSEUDO + " : " + stdIn.readLine();
+            if (emittedMessage.equals(PSEUDO+" : .")){
+                emittedMessage = PSEUDO+" left.";
             }
             
-            byte[] buf = new byte[1000];
-            buf = emitted_message.getBytes();
+            buf = emittedMessage.getBytes();
             
             // Send a datagram packet destined for the server
             DatagramPacket packet = new DatagramPacket(buf, buf.length, SERVER_ADDRESS, SERVER_PORT);
