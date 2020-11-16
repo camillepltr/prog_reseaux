@@ -4,7 +4,7 @@
  * Date: 10/01/04
  * Authors:
  */
-package stream;
+package stream_tcp;
 
 import java.io.*;
 import java.net.*;
@@ -46,7 +46,7 @@ public class EchoClient {
             System.exit(1);
         }
         
-        System.out.println("Quel est votre pseudo?");
+        System.out.println("What's your pseudo?");
         String pseudo = stdIn.readLine();
         String line = "";
         while (true) {
