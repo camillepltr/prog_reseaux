@@ -23,12 +23,13 @@ public class EchoServer  {
     			new InputStreamReader(clientSocket.getInputStream()));    
     		PrintStream socOut = new PrintStream(clientSocket.getOutputStream());
     		while (true) {
-			  String line = socIn.readLine();
-			  System.out.println("Client " + clientSocket.getInetAddress() + " : " + line);
-    		  socOut.println(line);
+               
+                String line = socIn.readLine();
+                System.out.println("Message client "+clientSocket.getInetAddress()+": "+line);
+                socOut.println(line);
     		}
     	} catch (Exception e) {
-        	System.err.println("Error in EchoServer:" + e); 
+        	System.err.println("Error in EchoServer in doService:" + e); 
         }
        }
   
@@ -52,7 +53,7 @@ public class EchoServer  {
 			doService(clientSocket);
 		}
         } catch (Exception e) {
-            System.err.println("Error in EchoServer:" + e);
+            System.err.println("Error in EchoServer in main :" + e);
         }
       }
   }

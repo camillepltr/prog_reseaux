@@ -32,11 +32,11 @@ public class EchoClient {
 
         try {
       	    // creation socket ==> connexion
-      	    echoSocket = new Socket(args[0],Integer.valueOf(args[1]));
-	    socIn = new BufferedReader(
-	    		          new InputStreamReader(echoSocket.getInputStream()));    
-	    socOut= new PrintStream(echoSocket.getOutputStream());
-	    stdIn = new BufferedReader(new InputStreamReader(System.in));
+      	    echoSocket = new Socket(args[0],new Integer(args[1]).intValue());  
+            socOut= new PrintStream(echoSocket.getOutputStream());
+            stdIn = new BufferedReader(new InputStreamReader(System.in));
+            ReceptionClientThread ct = new ReceptionClientThread(echoSocket);
+			ct.start();
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host:" + args[0]);
             System.exit(1);
@@ -45,18 +45,19 @@ public class EchoClient {
                                + "the connection to:"+ args[0]);
             System.exit(1);
         }
-                             
-        String line;
+        
+        System.out.println("Quel est votre pseudo?");
+        String pseudo = stdIn.readLine();
+        String line = "";
         while (true) {
         	line=stdIn.readLine();
-        	if (line.equals(".")) break;
-        	socOut.println(line);
-        	System.out.println("You : " + socIn.readLine());
+        	if (line.equals(".")){
+                socOut.println(line);
+                break;
+            }
+        	socOut.println(pseudo+" : "+line);
         }
-      socOut.close();
-      socIn.close();
-      stdIn.close();
-      echoSocket.close();
+        stdIn.close();
     }
 }
 
