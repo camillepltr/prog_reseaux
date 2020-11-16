@@ -2,4 +2,4 @@
 
 Auteurs : Camélia GUERRAOUI, Camille PELTIER
 
-INSA Lyon - 4IF2 - Binôme ?
+INSA Lyon - 4IF2 - Binôme 9
