@@ -14,10 +14,16 @@ import java.net.*;
 public class EchoClient {
 
  
-  /**
-  *  main method
-  *  accepts a connection, receives a message from client then sends an echo to the client
-  **/
+ 	/**
+  	* main method, client side
+  	* 	- TCP protocol
+  	* 	- creates a communication socket with the server and starts a ReceptionClientThread to receive messages from the server
+  	* 	- reads user (client) input and sends the message to to server
+	* @param EchoServerMultiThreadedPort port
+	* @exception
+	* @see ReceptionClientThread.java
+  	* 
+  	**/
     public static void main(String[] args) throws IOException {
 
         Socket echoSocket = null;

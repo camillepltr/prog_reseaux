@@ -15,13 +15,18 @@ public class ReceptionClientThread extends Thread {
 	
 	private Socket clientSocket;
 	
+    /**
+     * Constructor
+     * @param s the client's socket 
+     */
 	ReceptionClientThread(Socket s) {
 		this.clientSocket = s;
 	}
 
  	/**
-  	* receives a request from client then sends an echo to the client
-  	* @param clientSocket the client socket
+  	* Client side : 
+  	* receives a message and displays it
+  	* @exception 
   	**/
 	public void run() {
         try {
@@ -33,6 +38,7 @@ public class ReceptionClientThread extends Thread {
                 line = socIn.readLine();
                 System.out.println(line);
     		}
+    		//After disconnection, close the streams
             socIn.close();
             clientSocket.close();
     	} catch (Exception e) {

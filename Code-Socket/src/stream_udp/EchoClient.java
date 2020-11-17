@@ -29,7 +29,7 @@ public class EchoClient {
     public static void main(String[] args) throws IOException {
         // Server's Parameters 
         final int SERVER_PORT = 3500; 
-        final String SERVER_NAME = "Macbook-Cami-3";
+        final String SERVER_NAME = "camille-UX310UA";
         final InetAddress SERVER_ADDRESS = InetAddress.getByName(SERVER_NAME);
         
         // Group's Parameters 
