@@ -13,7 +13,9 @@ package stream_udp;
 
 import java.io.*;
 import java.net.*;
-
+import java.rmi.*;
+import java.rmi.registry.*;
+import java.util.LinkedList;
 
 public class EchoClient {
 
@@ -46,12 +48,10 @@ public class EchoClient {
         final String PSEUDO = stdIn.readLine();
         String emittedMessage = "";
         
-        String firstMessageToServer = "First Connexion";
-        byte[] buf = firstMessageToServer.getBytes();
+        printHistory(SERVER_PORT);
         
-        // Send a datagram packet destined for the server
-        DatagramPacket packet = new DatagramPacket(buf, buf.length, SERVER_ADDRESS, SERVER_PORT);
-        clientSocket.send(packet);
+        String firstMessageToServer = PSEUDO+" is connected";
+        sendMessage(clientSocket, firstMessageToServer, SERVER_ADDRESS, SERVER_PORT);
         
         // Launch reception thread
         ReceptionMessageClientThread reception = new ReceptionMessageClientThread(clientSocket, PSEUDO, GROUP_ADDRESS);
@@ -65,14 +65,35 @@ public class EchoClient {
                 emittedMessage = PSEUDO+" left.";
             }
             
-            buf = emittedMessage.getBytes();
-            
-            // Send a datagram packet destined for the server
-            packet = new DatagramPacket(buf, buf.length, SERVER_ADDRESS, SERVER_PORT);
-            clientSocket.send(packet);
+            sendMessage(clientSocket, emittedMessage, SERVER_ADDRESS, SERVER_PORT);
         }
-
     }
+    
+    private static void sendMessage(MulticastSocket clientSocket, String message, final InetAddress address, final int port){
+        byte[] buf = message.getBytes();
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
+        try {
+            clientSocket.send(packet);
+        } catch (Exception e) {
+            System.err.println("Error in sendMessage - EchoClient:" + e);
+        }
+    }
+    
+    private static void printHistory(final int port){
+        try {
+            Registry registry = LocateRegistry.getRegistry(port);
+            HistoryInterface h = (HistoryInterface) registry.lookup("History");
+            LinkedList<String> history = h.getHistory();
+            
+            for (String previousMessage : history){
+                System.out.println(previousMessage);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error in printHistory EchoClient:" + e);
+        }
+    }
+    
 }
 
 

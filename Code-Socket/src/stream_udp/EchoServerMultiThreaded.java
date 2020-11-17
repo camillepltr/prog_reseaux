@@ -10,9 +10,10 @@
 
 package stream_udp;
 
-import java.io.*;
 import java.net.*;
-import java.util.LinkedList;
+import java.rmi.*;
+import java.rmi.server.*;
+import java.rmi.registry.*;
 
 public class EchoServerMultiThreaded  {
   
@@ -26,14 +27,19 @@ public class EchoServerMultiThreaded  {
         
         System.out.println("Server Launched");
         final int SERVER_PORT = 3500;
-        LinkedList<DatagramPacket> history = new LinkedList<DatagramPacket>();
-        
+
         try {
             // Group's Parameters 
             final String GROUP_NAME = "228.5.6.7";
             final InetAddress GROUP_ADDRESS = InetAddress.getByName(GROUP_NAME);
             
             MulticastSocket serverSocket = new MulticastSocket(SERVER_PORT);
+            
+            History h = new History();
+            HistoryInterface h_stub = (HistoryInterface) UnicastRemoteObject.exportObject(h, 0);
+            Registry registry = LocateRegistry.createRegistry(SERVER_PORT);
+            registry.bind("History", h_stub);
+
             
             while (true) {
                 
@@ -47,15 +53,9 @@ public class EchoServerMultiThreaded  {
                 InetAddress clientAddress = packet.getAddress();
                 
                 String message = new String(packet.getData());
-                if (message.startsWith("First Connexion")){
-                    for (DatagramPacket previousPacket : history){
-                        sendMessage(serverSocket, previousPacket, clientAddress, groupPort);
-                    }
-
-                } else {
-                    history.add(packet);
-                    sendMessage(serverSocket, packet, GROUP_ADDRESS, groupPort);
-                }
+            
+                h.addMessageToHistory(packet);
+                sendMessage(serverSocket, packet, GROUP_ADDRESS, groupPort);
                 
             }
         } catch (Exception e) {

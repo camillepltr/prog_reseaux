@@ -10,7 +10,6 @@
 
 package stream_udp;
 
-import java.io.*;
 import java.net.*;
 
 public class ReceptionMessageClientThread extends Thread {
