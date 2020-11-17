@@ -11,16 +11,20 @@ import java.io.*;
 import java.net.*;
 import java.util.LinkedList;
 
+import javax.swing.JTextArea;
+
 public class ReceptionClientThread extends Thread {
 	
 	private Socket clientSocket;
+	private JTextArea conversation;
 	
     /**
      * Constructor
      * @param s the client's socket 
      */
-	ReceptionClientThread(Socket s) {
+	ReceptionClientThread(Socket s, JTextArea c) {
 		this.clientSocket = s;
+		this.conversation = c;
 	}
 
  	/**
@@ -36,7 +40,8 @@ public class ReceptionClientThread extends Thread {
             String line = "";
     		while (!line.equals("You are disconnected")) {
                 line = socIn.readLine();
-                System.out.println(line);
+                //System.out.println(line);
+                conversation.append(line + "\n");
     		}
     		//After disconnection, close the streams
             socIn.close();
@@ -44,6 +49,7 @@ public class ReceptionClientThread extends Thread {
     	} catch (Exception e) {
         	System.err.println("Error in ReceptionClientThread:" + e); 
         }
-       }
+    }
+
   
   }

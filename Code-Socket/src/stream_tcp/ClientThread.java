@@ -15,6 +15,7 @@ public class ClientThread extends Thread {
 	
 	private Socket clientSocket;
     private static LinkedList<PrintStream> socketOuts = new LinkedList<PrintStream>();
+
 	
     /**
      * Constructor
