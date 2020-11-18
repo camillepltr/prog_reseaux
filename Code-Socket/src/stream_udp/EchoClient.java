@@ -13,7 +13,6 @@ package stream_udp;
 
 import java.io.*;
 import java.net.*;
-import java.rmi.*;
 import java.rmi.registry.*;
 import java.util.ArrayList;
 

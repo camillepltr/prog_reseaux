@@ -11,7 +11,6 @@
 package stream_udp;
 
 import java.net.*;
-import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.*;
 
@@ -50,9 +49,6 @@ public class EchoServerMultiThreaded  {
                 System.out.println("A packet has been received.");
                 
                 int groupPort = packet.getPort();
-                InetAddress clientAddress = packet.getAddress();
-                
-                String message = new String(packet.getData());
             
                 h.addMessageToHistory(packet);
                 sendMessage(serverSocket, packet, GROUP_ADDRESS, groupPort);

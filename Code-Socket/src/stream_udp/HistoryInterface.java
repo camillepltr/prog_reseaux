@@ -8,7 +8,6 @@
 
 package stream_udp;
 
-import java.io.*;
 import java.rmi.*;
 import java.util.ArrayList;
 
