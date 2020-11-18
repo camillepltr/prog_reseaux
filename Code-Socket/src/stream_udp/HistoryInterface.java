@@ -10,7 +10,7 @@ package stream_udp;
 
 import java.io.*;
 import java.rmi.*;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public interface HistoryInterface extends Remote {
 	
@@ -18,6 +18,6 @@ public interface HistoryInterface extends Remote {
      * Method provided by the remote object to get the message history
      * @return a list of saved messages
      */
-    public LinkedList<String> getHistory() throws RemoteException;
+    public ArrayList<String> getHistory() throws RemoteException;
   
 }

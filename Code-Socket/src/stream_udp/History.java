@@ -8,29 +8,33 @@
 
 package stream_udp;
 
-import java.io.*;
+import java.nio.file.*;
+import java.nio.charset.Charset;
 import java.net.*;
 import java.rmi.*;
 import java.rmi.server.*;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class History implements HistoryInterface {
     
-    private LinkedList<String> history;
+    private ArrayList<String> history;
+    private final String saveFileName;
     
     /**
      * Default constructor
      * Initialise an empty list of messages (String)
      */
-    public History(){
-        this.history = new LinkedList<String>();
+    public History(String fileName){
+        this.history = new ArrayList<String>();
+        this.saveFileName = fileName;
+        this.loadHistory();
     }
 	
     /**
      * Remote method to get the message history
      * @return the list of messages
      */
-    public LinkedList<String> getHistory() throws RemoteException {
+    public ArrayList<String> getHistory() throws RemoteException {
         return this.history;
     }
     
@@ -41,6 +45,28 @@ public class History implements HistoryInterface {
     public void addMessageToHistory(DatagramPacket newPacket) {
         String newMessage = new String(newPacket.getData(), newPacket.getOffset(), newPacket.getLength());
         this.history.add(newMessage);
+        
+        try {
+            Path path = Paths.get(this.saveFileName);
+            newMessage += "\n";
+            Files.write(path, newMessage.getBytes(), StandardOpenOption.APPEND);
+        } catch (Exception e) {
+            System.err.println("Error in History while adding a message :" + e);
+        }
+    }
+    
+    private void loadHistory(){
+        
+        Path path = Paths.get(this.saveFileName);
+        
+        try {
+            if (!Files.exists(path)){
+                Files.createFile(path);
+            }
+            this.history = (ArrayList<String>) Files.readAllLines(path, Charset.forName("UTF-8"));
+        } catch (Exception e) {
+            System.err.println("Error in History while loading history :" + e);
+        }
     }
   
 }

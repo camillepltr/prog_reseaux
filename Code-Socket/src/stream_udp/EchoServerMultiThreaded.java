@@ -35,7 +35,7 @@ public class EchoServerMultiThreaded  {
             
             MulticastSocket serverSocket = new MulticastSocket(SERVER_PORT);
             
-            History h = new History();
+            History h = new History("src/stream_udp/savedHistory.txt");
             HistoryInterface h_stub = (HistoryInterface) UnicastRemoteObject.exportObject(h, 0);
             Registry registry = LocateRegistry.createRegistry(SERVER_PORT);
             registry.bind("History", h_stub);
@@ -58,6 +58,8 @@ public class EchoServerMultiThreaded  {
                 sendMessage(serverSocket, packet, GROUP_ADDRESS, groupPort);
                 
             }
+            
+            
         } catch (Exception e) {
             System.err.println("Error in EchoServerMultiThreaded:" + e);
         }

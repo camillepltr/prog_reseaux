@@ -15,7 +15,7 @@ import java.io.*;
 import java.net.*;
 import java.rmi.*;
 import java.rmi.registry.*;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 public class EchoClient {
 
@@ -83,7 +83,7 @@ public class EchoClient {
         try {
             Registry registry = LocateRegistry.getRegistry(port);
             HistoryInterface h = (HistoryInterface) registry.lookup("History");
-            LinkedList<String> history = h.getHistory();
+            ArrayList<String> history = h.getHistory();
             
             for (String previousMessage : history){
                 System.out.println(previousMessage);

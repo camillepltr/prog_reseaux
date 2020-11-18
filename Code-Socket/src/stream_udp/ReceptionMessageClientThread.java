@@ -38,7 +38,6 @@ public class ReceptionMessageClientThread extends Thread {
 	public void run() {
         try {
             String receivedMessage = "";
-            
     		while (!receivedMessage.startsWith(this.PSEUDO+" left.")) {
                 
                 byte[] buf = new byte[256];
@@ -51,7 +50,7 @@ public class ReceptionMessageClientThread extends Thread {
                 System.out.println(receivedMessage);
 
     		}
-            clientSocket.leaveGroup(this.GROUP_ADDRESS);
+            //clientSocket.leaveGroup(this.GROUP_ADDRESS);
             //clientSocket.close();
 
     	} catch (Exception e) {

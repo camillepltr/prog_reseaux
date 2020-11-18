@@ -15,13 +15,19 @@ public class ClientThread extends Thread {
 	
 	private Socket clientSocket;
     private static LinkedList<PrintStream> socketOuts = new LinkedList<PrintStream>();
+
 	
+    /**
+     * Constructor
+     * @param s the client's socket 
+     */
 	ClientThread(Socket s) {
 		this.clientSocket = s;
 	}
     
     /**
-     * 
+     * when the client wants to quit, removes the client's stream from the list of output streams of the server
+     * @exception
      * */
     private void quitConversation(){
         try {
@@ -34,8 +40,9 @@ public class ClientThread extends Thread {
     }
 
  	/**
-  	* receives a request from client then sends an echo to the client
-  	* @param clientSocket the client socket
+ 	* Server side:
+  	* receives a message from a client then sends it to all the clients (through the output
+  	* streams in the list socketsOut)
   	**/
 	public void run() {
     	  try {
