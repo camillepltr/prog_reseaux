@@ -12,11 +12,14 @@ package stream_udp;
 
 import java.net.*;
 
+import javax.swing.JTextArea;
+
 public class ReceptionMessageClientThread extends Thread {
 	
 	private MulticastSocket clientSocket;
     private final String PSEUDO;
     private final InetAddress GROUP_ADDRESS;
+    private JTextArea conversation;
     
     /**
      * Constructor
@@ -24,10 +27,11 @@ public class ReceptionMessageClientThread extends Thread {
      * @param INITIAL_PSEUDO client's pseudonym 
      * @param INITIAL_GROUP_ADDRESS client's group IP address
      */
-	ReceptionMessageClientThread(MulticastSocket initialSocket, final String INITIAL_PSEUDO, final InetAddress INITIAL_GROUP_ADDRESS) {
+	ReceptionMessageClientThread(MulticastSocket initialSocket, final String INITIAL_PSEUDO, final InetAddress INITIAL_GROUP_ADDRESS, JTextArea conv) {
 		this.clientSocket = initialSocket;
         this.PSEUDO = INITIAL_PSEUDO;
         this.GROUP_ADDRESS = INITIAL_GROUP_ADDRESS;
+        this.conversation = conv;
 	}
 
  	/**
@@ -47,11 +51,13 @@ public class ReceptionMessageClientThread extends Thread {
                 clientSocket.receive(packet);
                 receivedMessage = new String(packet.getData(), packet.getOffset(), packet.getLength());
 
-                System.out.println(receivedMessage);
+                //System.out.println(receivedMessage);
+                conversation.append(receivedMessage + "\n");
 
     		}
             //clientSocket.leaveGroup(this.GROUP_ADDRESS);
             //clientSocket.close();
+    		System.exit(0);
 
     	} catch (Exception e) {
         	System.err.println("Error in ReceptionClientThread:" + e); 

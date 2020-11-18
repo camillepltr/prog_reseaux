@@ -88,8 +88,8 @@ public class EchoClient  extends JFrame implements ActionListener{
 
         Socket echoSocket = null;
         PrintStream socOut = null;
-        BufferedReader stdIn = null;
-        BufferedReader socIn = null;
+        //BufferedReader stdIn = null;
+        //BufferedReader socIn = null;
         
 
         if (args.length != 2) {
@@ -102,13 +102,13 @@ public class EchoClient  extends JFrame implements ActionListener{
         String pseudo = stdIn.readLine();
         */
         
-        String pseudo = JOptionPane.showInputDialog( "Chat's your pseudo?");
+        String pseudo = JOptionPane.showInputDialog( "what's your pseudo?");
 
         try {
       	    // creation socket ==> connexion
       	    echoSocket = new Socket(args[0],new Integer(args[1]).intValue());  
             socOut= new PrintStream(echoSocket.getOutputStream());
-            stdIn = new BufferedReader(new InputStreamReader(System.in));
+            //stdIn = new BufferedReader(new InputStreamReader(System.in));
             EchoClient interfaceClient = new EchoClient(socOut, pseudo);
             ReceptionClientThread ct = new ReceptionClientThread(echoSocket, interfaceClient.conversation );
 			ct.start();
@@ -133,7 +133,6 @@ public class EchoClient  extends JFrame implements ActionListener{
         	socOut.println(pseudo+" : "+line);
         }
         stdIn.close();*/
-        System.out.println("done");
     }
     
     @Override
