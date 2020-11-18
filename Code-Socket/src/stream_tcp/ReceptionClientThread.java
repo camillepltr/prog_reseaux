@@ -42,9 +42,10 @@ public class ReceptionClientThread extends Thread {
                 //System.out.println(line);
                 conversation.append(line + "\n");
     		}
-    		//After disconnection, close the streams
+    		//After disconnection, close the streams and terminate program
             socIn.close();
             clientSocket.close();
+            System.exit(0);
     	} catch (Exception e) {
         	System.err.println("Error in ReceptionClientThread:" + e); 
         }
