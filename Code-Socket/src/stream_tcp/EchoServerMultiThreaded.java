@@ -7,7 +7,6 @@
 
 package stream_tcp;
 
-import java.io.*;
 import java.net.*;
 
 public class EchoServerMultiThreaded  {

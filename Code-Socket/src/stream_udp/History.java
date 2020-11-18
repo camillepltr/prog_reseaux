@@ -12,7 +12,6 @@ import java.nio.file.*;
 import java.nio.charset.Charset;
 import java.net.*;
 import java.rmi.*;
-import java.rmi.server.*;
 import java.util.ArrayList;
 
 public class History implements HistoryInterface {
@@ -22,7 +21,7 @@ public class History implements HistoryInterface {
     
     /**
      * Default constructor
-     * Initialise an empty list of messages (String)
+     * Initialize an empty list of messages (String)
      */
     public History(String fileName){
         this.history = new ArrayList<String>();

@@ -9,7 +9,6 @@ package stream_tcp;
 
 import java.io.*;
 import java.net.*;
-import java.util.LinkedList;
 
 import javax.swing.JTextArea;
 
