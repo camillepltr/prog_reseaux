@@ -1,14 +1,4 @@
-/**
- * ClientInterface
- * A client connects to a specific server and then chats with other people.
- * This class :
- * - connects the client to the server using the UDP Protocol.
- * - launches a parallel reception thread
- * - emits every messages to the server.
- * @author Camille Peltier, Camélia Guerraoui
- * @see ReceptionMessageClientThread
- * @see ClientApplication
- */
+
 package stream_udp;
 
 import java.io.*;
@@ -32,6 +22,17 @@ import java.net.*;
 import java.rmi.registry.*;
 import java.util.ArrayList;
 
+/**
+ * A client connects to a specific server and then chats with other people.
+ * This class :
+ * - creates a User Interface by extending JFrame.
+ * - connects the client to the server using the UDP Protocol.
+ * - launches a parallel reception thread.
+ * - emits every messages to the server.
+ * @author Camille Peltier, Camélia Guerraoui
+ * @see ReceptionMessageClientThread
+ * @see ClientApplication
+ */
 public class ClientInterface extends JFrame implements ActionListener, MouseListener, KeyListener{
 	private MulticastSocket clientSocket = null;
 	private final InetAddress SERVER_ADDRESS;
@@ -44,6 +45,16 @@ public class ClientInterface extends JFrame implements ActionListener, MouseList
     private JButton disconnectButton = new JButton("Disconnect");
     private final String INITIAL_MESSAGE = "Write your message here";
     
+    /**
+     * Constructor
+     * Initialize a MulticastSocket to communicate with the server and a specific group
+     * Creates a User Interface for the client to chat 
+     * @param serverAddress Server address
+     * @param groupAddress Group Address
+     * @param serverPort Server Port
+     * @param pseudo Client's pseudo
+     * @throws IOException
+     */
     public ClientInterface(final InetAddress serverAddress,
     				  final InetAddress groupAddress,
     				  final int serverPort,
@@ -155,7 +166,7 @@ public class ClientInterface extends JFrame implements ActionListener, MouseList
 	}
 	
     /**
-     * Sends the message in text area msgToSend to the server
+     * Sends the message in msgToSend (JTextArea) to the server
      */
 	private void sendWrittenMessageFromUser() {
 		String message = this.PSEUDO+" : "+msgToSend.getText();

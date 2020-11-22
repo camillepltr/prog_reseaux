@@ -1,9 +1,3 @@
-/***
- * History
- * Remote object to save the message history
- * @author Camille Peltier, Camélia Guerraoui
- * @see HistoryInterface
- */
 
 package stream_udp;
 
@@ -13,6 +7,11 @@ import java.net.*;
 import java.rmi.*;
 import java.util.ArrayList;
 
+/***
+ * Remote object to save the message history.
+ * @author Camille Peltier, Camélia Guerraoui
+ * @see HistoryInterface
+ */
 public class History implements HistoryInterface {
     
     private ArrayList<String> history;

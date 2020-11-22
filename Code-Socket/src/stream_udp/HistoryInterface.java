@@ -1,15 +1,14 @@
-/***
- * HistoryInterface
- * Remote interface for a History object
- * @author Camille Peltier, Camélia Guerraoui
- * @see History
- */
 
 package stream_udp;
 
 import java.rmi.*;
 import java.util.ArrayList;
 
+/***
+ * Remote interface for a History object
+ * @author Camille Peltier, Camélia Guerraoui
+ * @see History
+ */
 public interface HistoryInterface extends Remote {
 	
     /** 

@@ -1,11 +1,3 @@
-/***
- * ReceptionMessageClientThread
- * This class extends Thread Class.
- * It receives every messages for the client using the UDP Protocol
- * It is launched by the class EchoClient.
- * @author Camille Peltier, Camélia Guerraoui
- * @see EchoClient
- */
 
 package stream_udp;
 
@@ -13,6 +5,13 @@ import java.net.*;
 
 import javax.swing.JTextArea;
 
+/**
+ * This class extends Thread Class.
+ * It receives every messages for the client using the UDP Protocol.
+ * It is launched by the class ClientInterface.
+ * @author Camille Peltier, Camélia Guerraoui
+ * @see ClientInterface
+ */
 public class ReceptionMessageClientThread extends Thread {
 	
 	private MulticastSocket clientSocket;

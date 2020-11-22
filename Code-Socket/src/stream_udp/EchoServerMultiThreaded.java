@@ -1,11 +1,3 @@
-/**
- * EchoServerMultiThreaded
- * A server connects with client and transfers messages
- * This class :
- * - connects the client to the server using the UDP Protocol.
- * - transfers messages from a client to the rest of his group
- * @author Camille Peltier, Camélia Guerraoui
- */
 
 package stream_udp;
 
@@ -16,6 +8,13 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.*;
 
+/**
+ * A server connects with client and transfers messages.
+ * This class :
+ * - connects the client to the server using the UDP Protocol.
+ * - transfers messages from a client to the rest of his group.
+ * @author Camille Peltier, Camélia Guerraoui
+ */
 public class EchoServerMultiThreaded  {
   
  	/**
