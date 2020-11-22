@@ -1,7 +1,6 @@
 /***
  * HistoryInterface
  * Remote interface for a History object
- * @since 16/11/2021
  * @author Camille Peltier, Camélia Guerraoui
  * @see History
  */

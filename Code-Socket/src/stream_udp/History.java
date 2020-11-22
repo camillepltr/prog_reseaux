@@ -1,7 +1,6 @@
 /***
  * History
  * Remote object to save the message history
- * @since 16/11/2021
  * @author Camille Peltier, Camélia Guerraoui
  * @see HistoryInterface
  */
@@ -17,15 +16,15 @@ import java.util.ArrayList;
 public class History implements HistoryInterface {
     
     private ArrayList<String> history;
-    private final String saveFileName;
+    private final String SAVED_FILE_NAME;
     
     /**
      * Default constructor
      * Initialize an empty list of messages (String)
      */
-    public History(String fileName){
+    public History(final String FILE_NAME){
         this.history = new ArrayList<String>();
-        this.saveFileName = fileName;
+        this.SAVED_FILE_NAME = FILE_NAME;
         this.loadHistory();
     }
 	
@@ -46,7 +45,7 @@ public class History implements HistoryInterface {
         this.history.add(newMessage);
         
         try {
-            Path path = Paths.get(this.saveFileName);
+            Path path = Paths.get(this.SAVED_FILE_NAME);
             newMessage += "\n";
             Files.write(path, newMessage.getBytes(), StandardOpenOption.APPEND);
         } catch (Exception e) {
@@ -56,7 +55,7 @@ public class History implements HistoryInterface {
     
     private void loadHistory(){
         
-        Path path = Paths.get(this.saveFileName);
+        Path path = Paths.get(this.SAVED_FILE_NAME);
         
         try {
             if (!Files.exists(path)){
