@@ -45,22 +45,22 @@ public class WebPing {
 
 	    	//Send a request
 		    PrintWriter out = new PrintWriter(sock.getOutputStream());
-		    out.println("GET src/Adder.html HTTP/1.0 <CR><LF>");
-	        out.println("Host : localhost <CR><LF>");
-	        out.println("<CR><LF>");
+		    out.println("GET src/Adder.html HTTP/1.0\r\n");
+	        out.println("Host : localhost\r\n");
+	        out.println("\r\n");
 	        out.flush();
 
 	        //Print the response's status and header
 	        BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 	        String s = "";
-	        while(!s.equals("<CR><LF>")) {
+	        while(!s.equals("\r\n")) {
 	        	s = in.readLine();
 	        	System.out.println(s);
 	        }
 
 	        //Print the responses's content i.e. the message body
 	        s = "";
-	        while(!s.equals("<CR><LF>")) {
+	        while(!s.equals("\r\n")) {
 	        	s = in.readLine();
 	        	System.out.println(s);
 	        }

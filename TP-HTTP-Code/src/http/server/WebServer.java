@@ -1,4 +1,3 @@
-///A Simple Web Server (WebServer.java)
 
 package http.server;
 
@@ -22,44 +21,45 @@ import java.util.ArrayList;
  * WebServer is a very simple web-server. Any request is responded with a very
  * simple web-page.
  * 
- * @author Jeff Heaton
- * @version 1.0
+ * @author Jeff Heaton, Camille Peltier, Camélia Guerraoui
+ * @version 1.2
  */
 public class WebServer { 
 	  /**Path to the home page, to change depending on the path on your computer*/
 	  private static final String INDEX = "/home/camille/git/prog_reseaux/TP-HTTP-Code/doc/index.html";
 
+	  /**
+	   * Creates a socket and waits for connection.
+	   * When a client send a request of connection, the server accepts it. 
+	   * The server reads the data sent and stops reading once a blank line is hit. 
+	   * This blank line siganls the end of the client HTTP Headers
+	   */
 	  protected void start() {
-	    ServerSocket s;
+		  ServerSocket s;
 	
-	    System.out.println("Webserver starting up on port 3000");
-	    System.out.println("(press ctrl-c to exit)");
-	    try {
-	      // create the main server socket
-	      s = new ServerSocket(3000);
-	    } catch (Exception e) {
-	      System.out.println("Error: " + e);
-	      return;
-	    }
+		  System.out.println("Webserver starting up on port 3000");
+
+		  try {
+			  s = new ServerSocket(3000);
+		  } catch (Exception e) {
+			  System.out.println("Error: " + e);
+			  return;
+		  }
 	
-	    System.out.println("Waiting for connection");
-	    for (;;) {
-	        try {
-		          // wait for a connection
+		  System.out.println("Waiting for connection");
+		  for (;;) {
+			  try {
+		          // Wait for a connection
 		          Socket remote = s.accept();
-		          // remote is now the connected socket
+		          // Remote is now the connected socket
 		          System.out.println("\r\nConnection, sending data.");
 		          BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
 		          PrintWriter out = new PrintWriter(remote.getOutputStream());
-		
-		          // read the data sent. We basically ignore it,
-		          // stop reading once a blank line is hit. This
-		          // blank line signals the end of the client HTTP
-		          // headers.
-		          
+
 		          String requestHeader ="";
 		          // Le header fini par \r\n\r\n (CR LF CR LF)
-		          int currentChar = '\0', previousChar = '\0';
+		          int currentChar = '\0';
+		          int previousChar = '\0';
 				  boolean newline = false;
 				  while((currentChar = in.read()) != -1 && !(newline && previousChar == '\r' && currentChar == '\n')) {
 					  if(previousChar == '\r' && currentChar == '\n') {
@@ -76,13 +76,12 @@ public class WebServer {
 		          System.out.println(requestHeader);
 		          
 		         // Default : open index.html
-				 if(requestHeaderSplit[1].equals("/")) {
-					 	System.out.println("Open index");
-						requestGET(out, INDEX);
-				 } else {
-		          
+		          if(requestHeaderSplit[1].equals("/")) {
+		        	  System.out.println("Open index");
+		        	  requestGET(out, INDEX);
+		          } else {
 			          switch(requestHeaderSplit[0]) {
-							case "GET" :
+			          		case "GET" :
 								System.out.println("GET request received");
 								requestGET(out, requestHeaderSplit[1]);
 						        break;
@@ -127,14 +126,13 @@ public class WebServer {
 	        } catch (Exception e) {
 	            System.err.println("Error in WebServer while loading ressource:" + e);
 	        }
-	        // Send the response
-            // Send the header
+	        // Send the response's header
             sendHeader(out, size, "200 OK");
-            // Send the HTML page
+            // Send the response's body
             for(String line : content) {
         	    out.println(line);
             }
-            out.println("<CR><LF>");
+            out.println("\r\n");
             out.flush();
             
             System.out.println("Response to GET : data sent");
@@ -147,7 +145,6 @@ public class WebServer {
 	  private void requestHEAD(PrintWriter out, String filePath) {
 		  Path path = Paths.get(filePath);
 		  long size = -1;
-		  
 
 	      try {
 	    	  size = Files.size(path);
@@ -155,7 +152,7 @@ public class WebServer {
 	          System.err.println("Error in WebServer while loading ressource:" + e);
 	      }
 	        
-          // Send the header
+          // Send the response's header
           sendHeader(out, size, "200 OK");
           
           out.flush();
@@ -195,6 +192,13 @@ public class WebServer {
 			}
 	  }
 	  
+	  /**
+	   * Sends the response's header.
+	   * First sendHeader method, when there is a content length to add to the header
+	   * @param out socket's output i.e. the stream where the data should be sent
+	   * @param size content length
+	   * @param responseStatus response's status according to the HTTP Protocol
+	   */
 	  private void sendHeader(PrintWriter out, long size, String responseStatus) {
 		  String header = "HTTP/1.0 " + responseStatus + "\r\n";
 		  header += "Content-Type: text/html; charset=UTF-8\r\n";
@@ -207,7 +211,10 @@ public class WebServer {
 	  }
 	  
 	  /**
+	   * Sends the response's header.
 	   * Second sendHeader method, when there is no content length to add to the header
+	   * @param out socket's output i.e. the stream where the data should be sent
+	   * @param responseStatus response's status according to the HTTP Protocol
 	   */
 	  private void sendHeader(PrintWriter out, String responseStatus) {
 		  String header = "HTTP/1.0 " + responseStatus +"\r\n";
@@ -219,13 +226,9 @@ public class WebServer {
 		  out.write(header);
 	  }
 	  
-  
-
 	  /**
 	   * Start the application.
-	   * 
-	   * @param args
-	   *            Command line parameters are not used.
+	   * @param args Command line parameters are not used.
 	   */
 	  public static void main(String args[]) {
 		    WebServer ws = new WebServer();
