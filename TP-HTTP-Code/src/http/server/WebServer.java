@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -47,7 +48,7 @@ public class WebServer {
 		          // wait for a connection
 		          Socket remote = s.accept();
 		          // remote is now the connected socket
-		          System.out.println("Connection, sending data.");
+		          System.out.println("\r\nConnection, sending data.");
 		          BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
 		          PrintWriter out = new PrintWriter(remote.getOutputStream());
 		
@@ -101,6 +102,7 @@ public class WebServer {
 								
 							case "DELETE" :
 								System.out.println("DELETE request received");
+								requestDELETE(out, requestHeaderSplit[1]);
 								break;
 								
 					        default : 
@@ -127,7 +129,7 @@ public class WebServer {
 	        }
 	        // Send the response
             // Send the header
-            sendHeader(out, size);
+            sendHeader(out, size, "200 OK");
             // Send the HTML page
             for(String line : content) {
         	    out.println(line);
@@ -154,7 +156,7 @@ public class WebServer {
 	      }
 	        
           // Send the header
-          sendHeader(out, size);
+          sendHeader(out, size, "200 OK");
           
           out.flush();
           System.out.println("Response to HEAD : data sent");
@@ -165,13 +167,51 @@ public class WebServer {
 	  }
 	  
 	  private void requestDELETE(PrintWriter out, String filePath) {
-			
+		  try {
+				File toDelete = new File(filePath);
+				boolean deleted = false;
+				boolean existed = false;
+				System.out.println("DELETE request received");
+				//Check that it is the filePath to a correct filre
+				if((existed = toDelete.exists()) && toDelete.isFile()) {
+					deleted = toDelete.delete();
+				}
+				
+				// Send Header
+				if(deleted) {
+					sendHeader(out,"204 No Content");
+				} else if (!existed) {
+					//TODO msg d'erreur 404 not found a faire dans la suite
+					System.out.println("file did not exist");
+				} else {
+					// TODO si trouvé mais pas supprimé, autre erreur
+					System.out.println("file was not deleted");
+				}
+				
+				out.flush();
+				System.out.println("Response to DELETE : data sent");
+			} catch (Exception e) {
+				System.err.println("Error in WebServer while deleting ressource:" + e);
+			}
 	  }
 	  
-	  private void sendHeader(PrintWriter out, long size) {
-		  String header = "HTTP/1.0 200 OK\r\n";
+	  private void sendHeader(PrintWriter out, long size, String responseStatus) {
+		  String header = "HTTP/1.0 " + responseStatus + "\r\n";
 		  header += "Content-Type: text/html; charset=UTF-8\r\n";
 		  header += "Content-Length : " + size +"\r\n";
+		  header += "Server: Bot\r\n";
+          // this blank line signals the end of the headers
+		  header += "\r\n";
+		  System.out.println(header);
+		  out.write(header);
+	  }
+	  
+	  /**
+	   * Second sendHeader method, when there is no content length to add to the header
+	   */
+	  private void sendHeader(PrintWriter out, String responseStatus) {
+		  String header = "HTTP/1.0 " + responseStatus +"\r\n";
+		  header += "Content-Type: text/html; charset=UTF-8\r\n";
 		  header += "Server: Bot\r\n";
           // this blank line signals the end of the headers
 		  header += "\r\n";
