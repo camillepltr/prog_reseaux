@@ -40,8 +40,9 @@ public class ClientInterface  extends JFrame implements ActionListener{
      * @param serverAddress Server Address
      * @param serverPort Server Port
      * @param pseudo Client's pseudo
-     * @throws UnknownHostException
-     * @throws IOException
+     * @throws UnknownHostException Thrown to indicate that the IP address of a host could not be determined.
+     * @throws IOException Signals that an I/O exception of some sort has occurred.
+     * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
      */
     public ClientInterface(String serverAddress, int serverPort, String pseudo) throws UnknownHostException, IOException {
     	super("Chat TCP - Client side - " + pseudo);

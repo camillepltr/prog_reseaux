@@ -23,8 +23,11 @@ public class ClientApplication {
     * and then the server port. It : 
     *  - Initializes the server port, the server name and the client's pseudo.
     *  - Creates a User Interface for the client to chat.
-	* @throws IOException 
-	* @throws UnknownHostException 
+    * @param args list of two Strings containing first the server name and the
+    * 		server port
+	* @throws IOException Signals that an I/O exception of some sort has occurred.
+	* 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
+	* @throws UnknownHostException Thrown to indicate that the IP address of a host could not be determined.
 	* @see ClientInterface
 	* @see ReceptionMessageClientThread
   	**/

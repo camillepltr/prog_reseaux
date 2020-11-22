@@ -33,7 +33,7 @@ public class ReceptionMessageClientThread extends Thread {
   	* Client side : receives a message and displays it.
   	* When the disconnection message is received,
   	* the socket is closed and the program is finished
-  	* @exception 
+  	* A IOException can be thrown. This is produced by failed or interrupted I/O operations.
   	**/
 	public void run() {
         try {

@@ -21,7 +21,9 @@ public class ClientApplication {
     /**
     * Initializes the server port, the server name, the group name and the client's pseudo
     * Creates a User Interface for the client to chat
-    * @throws IOException 
+    * @param args unused parameters
+	* @throws IOException Signals that an I/O exception of some sort has occurred.
+    * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
     * @see ClientInterface
     */
     public static void main(String[] args) throws IOException {

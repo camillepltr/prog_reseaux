@@ -21,9 +21,13 @@ public class EchoServerMultiThreaded  {
   	* Main Method :
     *   - connects the client to the server using the UDP Protocol.
     *   - transmits messages from a client to the rest of his group
-    * @exception
+    * @param args unused parameters
+ 	* @throws AlreadyBoundException An AlreadyBoundException is thrown if an attempt 
+ 	* 			is made to bind an object in the registry to a name that already has an associated binding.
+ 	* @throws IOException Signals that an I/O exception of some sort has occurred.
+    * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
   	**/
-    public static void main(String args[]){ 
+    public static void main(String args[]) throws IOException, AlreadyBoundException { 
         
         System.out.println("Server Launched");
 
@@ -32,16 +36,11 @@ public class EchoServerMultiThreaded  {
         final String SAVED_FILE_NAME = "src/stream_udp/savedHistory.txt";
         final String GROUP_NAME = "228.5.6.7";
 
-        try {
-            final InetAddress GROUP_ADDRESS = InetAddress.getByName(GROUP_NAME);
-            MulticastSocket serverSocket = new MulticastSocket(SERVER_PORT);
-            
-            History h = createHistory(SAVED_FILE_NAME, SERVER_PORT);
-            transmitMessages(h, serverSocket, GROUP_ADDRESS);
-            
-        } catch (Exception e) {
-            System.err.println("Error in EchoServerMultiThreaded:" + e);
-        }
+        final InetAddress GROUP_ADDRESS = InetAddress.getByName(GROUP_NAME);
+        MulticastSocket serverSocket = new MulticastSocket(SERVER_PORT);
+        
+        History h = createHistory(SAVED_FILE_NAME, SERVER_PORT);
+        transmitMessages(h, serverSocket, GROUP_ADDRESS);
     }
     
     /**

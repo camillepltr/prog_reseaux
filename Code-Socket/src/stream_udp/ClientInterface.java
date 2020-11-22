@@ -53,7 +53,8 @@ public class ClientInterface extends JFrame implements ActionListener, MouseList
      * @param groupAddress Group Address
      * @param serverPort Server Port
      * @param pseudo Client's pseudo
-     * @throws IOException
+	 * @throws IOException Signals that an I/O exception of some sort has occurred.
+     * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
      */
     public ClientInterface(final InetAddress serverAddress,
     				  final InetAddress groupAddress,

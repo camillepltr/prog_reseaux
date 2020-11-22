@@ -1,6 +1,7 @@
 
 package stream_tcp;
 
+import java.io.IOException;
 import java.net.*;
 
 /**
@@ -22,7 +23,8 @@ public class EchoServerMultiThreaded  {
   	* 	- uses TCP protocol.
   	* 	- sets a socket to listen for new clients
   	* 	- creates for each new client a communication socket and starts a ClientThread
-	* @exception
+  	* A IOException can be thrown. This is produced by failed or interrupted I/O operations.
+    * @param args list of one String representing the server port
 	* @see ClientThread
   	**/
    public static void main(String args[]){ 

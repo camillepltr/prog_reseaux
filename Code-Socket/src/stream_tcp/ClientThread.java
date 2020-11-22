@@ -36,8 +36,8 @@ public class ClientThread extends Thread {
  	/**
  	* Receives a message from a client then sends it to all the clients through the output
   	* streams in the list socketsOut
-  	* @exception
-  	**/
+  	* A IOException can be thrown. This is produced by failed or interrupted I/O operations.
+    */
 	public void run() {
     	  try {
     		  BufferedReader socIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));    

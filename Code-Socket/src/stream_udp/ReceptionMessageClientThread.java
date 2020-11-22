@@ -1,6 +1,7 @@
 
 package stream_udp;
 
+import java.io.IOException;
 import java.net.*;
 
 import javax.swing.JTextArea;
@@ -33,7 +34,7 @@ public class ReceptionMessageClientThread extends Thread {
  	/**
     * Main Method :
     *   - receives every messages for the client from his group
-    * @exception
+  	* A IOException can be thrown. This is produced by failed or interrupted I/O operations.
     */
 	public void run() {
         try {

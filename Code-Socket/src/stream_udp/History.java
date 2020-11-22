@@ -20,6 +20,7 @@ public class History implements HistoryInterface {
     /**
      * Default constructor
      * Initialize an empty list of messages (String)
+     * @param FILE_NAME path to file used to save the history
      */
     public History(final String FILE_NAME){
         this.history = new ArrayList<String>();
@@ -37,7 +38,7 @@ public class History implements HistoryInterface {
     
     /**
      * Add a message to the message history
-     * @param a new packet received by the server
+     * @param newPacket a new packet received by the server
      */
     public void addMessageToHistory(DatagramPacket newPacket) {
         String newMessage = new String(newPacket.getData(), newPacket.getOffset(), newPacket.getLength());
