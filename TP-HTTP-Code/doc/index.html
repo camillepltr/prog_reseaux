@@ -19,6 +19,7 @@
 		<button onclick="testHEAD('file_head')">Submit using HEAD</button>
         <script>
             testHEAD = function(entry) {
+            
 				var url = document.getElementById(entry).value;
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("HEAD", url, true); 

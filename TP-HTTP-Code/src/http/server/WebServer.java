@@ -55,27 +55,35 @@ public class WebServer {
 		          // stop reading once a blank line is hit. This
 		          // blank line signals the end of the client HTTP
 		          // headers.
-		          /*
-		          String str = ".";
-		          while (str != null && !str.equals("")) {
-		        	  str = in.readLine();
-		          }*/
-		          String requestType = in.readLine();
-		          String headers = in.readLine();
-		          String blank = in.readLine();
-		          String []requestTypeSplit = requestType.split(" ");
-		          System.out.println(requestType);
+		          
+		          String requestHeader ="";
+		          // Le header fini par \r\n\r\n (CR LF CR LF)
+		          int currentChar = '\0', previousChar = '\0';
+				  boolean newline = false;
+				  while((currentChar = in.read()) != -1 && !(newline && previousChar == '\r' && currentChar == '\n')) {
+					  if(previousChar == '\r' && currentChar == '\n') {
+						  newline = true;
+					  } else if(!(previousChar == '\n' && currentChar == '\r')) {
+						  newline = false;
+					  }
+					  previousChar = currentChar;
+					  requestHeader += (char) currentChar;
+				  }
+					
+		          String []requestHeaderSplit = requestHeader.split(" ");
+		          System.out.println("Request header :");
+		          System.out.println(requestHeader);
 		          
 		         // Default : open index.html
-				 if(requestTypeSplit[1].equals("/")) {
+				 if(requestHeaderSplit[1].equals("/")) {
 					 	System.out.println("Open index");
 						requestGET(out, INDEX);
 				 } else {
 		          
-			          switch(requestTypeSplit[0]) {
+			          switch(requestHeaderSplit[0]) {
 							case "GET" :
 								System.out.println("GET request received");
-								requestGET(out, requestTypeSplit[1]);
+								requestGET(out, requestHeaderSplit[1]);
 						        break;
 						        
 							case "POST" :
@@ -84,7 +92,7 @@ public class WebServer {
 								
 							case "HEAD" :
 								System.out.println("HEAD request received");
-								requestHEAD(out, requestTypeSplit[1]);
+								requestHEAD(out, requestHeaderSplit[1]);
 								break;
 								
 							case "PUT" :
@@ -109,27 +117,25 @@ public class WebServer {
 	  private void requestGET(PrintWriter out, String filePath) {
 			Path path = Paths.get(filePath);
 	        ArrayList<String> content = new ArrayList<String>();
+	        long size = -1;
 	      
 	        try {
 	             content = (ArrayList<String>) Files.readAllLines(path, Charset.forName("UTF-8"));
+	             size = Files.size(path);
 	        } catch (Exception e) {
 	            System.err.println("Error in WebServer while loading ressource:" + e);
 	        }
 	        // Send the response
-            // Send the headers
-            out.println("HTTP/1.0 200 OK<CR><LF>");
-            out.println("Content-Type: text/html; charset=UTF-8<CR><LF>");
-            out.println("Server: Bot<CR><LF>");
-            // this blank line signals the end of the headers
-            out.println("<CR><LF>");
+            // Send the header
+            sendHeader(out, size);
             // Send the HTML page
-          
             for(String line : content) {
         	    out.println(line);
             }
             out.println("<CR><LF>");
-            System.out.println("Response to GET : data sent");
             out.flush();
+            
+            System.out.println("Response to GET : data sent");
 	  }
 	  
 	  private void requestPOST(PrintWriter out, String filePath) {
@@ -138,23 +144,20 @@ public class WebServer {
 	  
 	  private void requestHEAD(PrintWriter out, String filePath) {
 		  Path path = Paths.get(filePath);
-	        ArrayList<String> content = new ArrayList<String>();
-	      
-	        try {
-	             content = (ArrayList<String>) Files.readAllLines(path, Charset.forName("UTF-8"));
-	        } catch (Exception e) {
-	            System.err.println("Error in WebServer while loading ressource:" + e);
-	        }
+		  long size = -1;
+		  
+
+	      try {
+	    	  size = Files.size(path);
+	      } catch (Exception e) {
+	          System.err.println("Error in WebServer while loading ressource:" + e);
+	      }
 	        
-          // Send the headers
-          out.println("HTTP/1.0 200 OK<CR><LF>");
-          out.println("Content-Type: text/html; charset=UTF-8<CR><LF>");
-          out.println("Server: Bot<CR><LF>");
-          // this blank line signals the end of the headers
-          out.println("<CR><LF>");
+          // Send the header
+          sendHeader(out, size);
           
-          System.out.println("Response to HEAD : data sent");
           out.flush();
+          System.out.println("Response to HEAD : data sent");
 	  }
 	  
 	  private void requestPUT(PrintWriter out, String filePath) {
@@ -163,6 +166,17 @@ public class WebServer {
 	  
 	  private void requestDELETE(PrintWriter out, String filePath) {
 			
+	  }
+	  
+	  private void sendHeader(PrintWriter out, long size) {
+		  String header = "HTTP/1.0 200 OK\r\n";
+		  header += "Content-Type: text/html; charset=UTF-8\r\n";
+		  header += "Content-Length : " + size +"\r\n";
+		  header += "Server: Bot\r\n";
+          // this blank line signals the end of the headers
+		  header += "\r\n";
+		  System.out.println(header);
+		  out.write(header);
 	  }
 	  
   
