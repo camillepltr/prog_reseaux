@@ -10,22 +10,41 @@
         Below you can try POST, HEAD, PUT and DELETE Requests.
         <h2>POST</h2>
 		<form method="post" action="/my/url/">
-			Enter the path of a file to open :  <input id="post_param" placeholder="/home/camille/git/prog_reseaux/TP-HTTP-Code/doc/index.html">
+			Enter the path of a file to open :  <input id="post_param" >
 			<input type="submit" name="submit" value="Submit using POST" />
         </form>
         
 		<h2>HEAD</h2>
-		Enter the path of a file to test HEAD request on : <input id="file_head" placeholder="/home/camille/git/prog_reseaux/TP-HTTP-Code/doc/index.html">
+		Enter the path of a file to test HEAD request on : <input id="file_head" >
 		<button onclick="testHEAD('file_head')">Submit using HEAD</button>
         <script>
             testHEAD = function(entry) {
+            
 				var url = document.getElementById(entry).value;
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("HEAD", url, true); 
                 xmlhttp.onreadystatechange=function() {
-                if(xmlhttp.readyState==4) { 
-                    console.log(xmlhttp.getAllResponseHeaders());
+	                if(xmlhttp.readyState==4) { 
+	                    console.log(xmlhttp.getAllResponseHeaders());
+	                }
                 }
+                xmlhttp.send(null); 
+            }
+        </script>
+        
+        <h2>DELETE</h2>
+		Enter the path of a file to test DELETE request on : <input id="file_delete" >
+		<button onclick="testDELETE('file_delete')">Submit using DELETE</button>
+        <script>
+            testDELETE = function(entry) {
+            
+				var url = document.getElementById(entry).value;
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("DELETE", url, true); 
+                xmlhttp.onreadystatechange=function() {
+	                if(xmlhttp.readyState==4) { 
+	                    console.log(xmlhttp.getAllResponseHeaders());
+	                }
                 }
                 xmlhttp.send(null); 
             }
