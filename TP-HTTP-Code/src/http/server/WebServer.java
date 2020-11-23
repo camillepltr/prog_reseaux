@@ -395,6 +395,11 @@ public class WebServer {
 			}
 	  }
 	  
+	  /**
+	   * Get the Content-Type for the response header depending on the file extension
+	   * @param filePath the filepath to the requested file
+	   * @return a String represnetation of the content-type weel-formed for the header
+	   */
 	  private String getContentType(String filePath) {
 		  String type = "";
 		  if (filePath.endsWith(".html")) {
@@ -434,6 +439,7 @@ public class WebServer {
 	   * @param out socket's output i.e. the stream where the data should be sent
 	   * @param size content length
 	   * @param responseStatus response's status according to the HTTP Protocol
+	   * @param filePath a String reprentation of the path to the requested file
 	   */
 	  //private void sendHeader(BufferedOutputStream out, long size, String responseStatus, String filePath){
 	  private void sendHeader(PrintWriter out, long size, String responseStatus, String filePath){
@@ -457,6 +463,7 @@ public class WebServer {
 	   * Second sendHeader method, when there is no content length to add to the header
 	   * @param out socket's output i.e. the stream where the data should be sent
 	   * @param responseStatus response's status according to the HTTP Protocol
+	   * @param filePath a String reprentation of the path to the requested file
 	   */
 	  //private void sendHeader(BufferedOutputStream out, String responseStatus, String filePath){
 	  private void sendHeader(PrintWriter out, String responseStatus, String filePath) {
