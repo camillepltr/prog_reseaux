@@ -85,33 +85,33 @@ public class WebServer {
 			          switch(requestHeaderSplit[0]) {
 			          		case "GET" :
 								System.out.println("GET request received");
-								requestGET(out, requestHeaderSplit[1]);
+								requestGET(out, "doc"+requestHeaderSplit[1]);
 						        break;
 						        
 							case "POST" :
 								System.out.println("POST request received");
 								requestBody = getRequestBody(in);
-								requestPOST(out, requestHeaderSplit[1], requestBody);
+								requestPOST(out, "doc"+requestHeaderSplit[1], requestBody);
 								break;
 								
 							case "HEAD" :
 								System.out.println("HEAD request received");
-								requestHEAD(out, requestHeaderSplit[1]);
+								requestHEAD(out, "doc"+requestHeaderSplit[1]);
 								break;
 								
 							case "PUT" :
 								System.out.println("PUT request received");
 								requestBody = getRequestBody(in);
-								requestPUT(out, requestHeaderSplit[1], requestBody);
+								requestPUT(out, "doc"+requestHeaderSplit[1], requestBody);
 								break;
 								
 							case "DELETE" :
 								System.out.println("DELETE request received");
-								requestDELETE(out, requestHeaderSplit[1]);
+								requestDELETE(out, "doc"+requestHeaderSplit[1]);
 								break;
 								
 					        default : 
-					        	sendHeader(out, "501 Not Implemented", requestHeaderSplit[1]);
+					        	sendHeader(out, "501 Not Implemented", "doc"+requestHeaderSplit[1]);
 					        	out.flush();
 					        	break;
 			          };
@@ -137,7 +137,7 @@ public class WebServer {
 	  private ArrayList<String> readFile(String filePath) {
 		  ArrayList<String> content = new ArrayList<String>();
 
-		  // read the response's body
+		  // read the requested file
 		  try {
 			  BufferedInputStream inFile = new BufferedInputStream(new FileInputStream(filePath));
 			  byte[] cbuf = new byte[1000];
@@ -247,52 +247,58 @@ public class WebServer {
 	  
 	  //private void requestHEAD(BufferedOutputStream out, String filePath) {
 	  private void requestHEAD(PrintWriter out, String filePath) {
-		  Path path = Paths.get(filePath);
-		  long size = -1;
+		    Path path = Paths.get(filePath);
+			String status = "200 OK";
+	      
+	        try {
+	        	if (!Files.exists(path)) {
+	        		path = Paths.get(NOT_FOUND);
+	        		filePath = NOT_FOUND;
+	        		status = "404 Not Found";
+				}
+	        	
+	        	ArrayList<String> content = readFile(filePath);
+	  		    sendHeader(out, Files.size(path), status, filePath);
+	  		    out.flush();
 
-	      try {
-	    	  if (!Files.exists(path)) {
-					sendHeader(out, size, "404 Not Found", filePath);
-					out.flush();
-					return;
-			  }
-	    	  size = Files.size(path);
-	          // Send the response's header
-	          sendHeader(out, size, "200 OK", filePath);
-	          out.flush();
-	          System.out.println("Response to HEAD : data sent");
-	      } catch (Exception e) {
-	    	  sendHeader(out,"500 Internal Server Error", filePath);
-			  out.flush();
-	          System.err.println("Error in WebServer while loading ressource:" + e);
-	      }
+	 	        System.out.println("Response to HEAD : data sent");
+	        } catch (Exception e) {
+				ArrayList<String> content = readFile(INTERNAL_ERROR);
+	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
+	        	sendBody(out, content);
+	            System.err.println("Error in WebServer while loading ressource:" + e);
+	        }
 
 	  }
 	  
 	  //private void requestPUT(BufferedOutputStream out, String filePath, String requestBody) {
 	  private void requestPUT(PrintWriter out, String filePath, String requestBody) {
+		  
 		  try {
-
+			    Path path = Paths.get(filePath);
+			    String status = "200 OK";
 			  	if (requestBody.isEmpty()) {
-			  		sendHeader(out,"400 Bad Request", filePath);
+			  		ArrayList<String> content = readFile(BAD_REQUEST);
+		  		    sendHeader(out, "400 Bad Request", BAD_REQUEST);
+		        	sendBody(out, content);
 			  		return;
 			  	}
-				Path path = Paths.get(filePath);
 
 				if (!Files.exists(path)){
 	                Files.createFile(path);
 	                Files.write(path, requestBody.getBytes(), StandardOpenOption.CREATE);
-					sendHeader(out,"201 Created", filePath);
+					status = "201 Created";
 	            } else {
 					Files.write(path, requestBody.getBytes(), StandardOpenOption.CREATE);
-					sendHeader(out,"200 OK", filePath);
 	            }
-
+				
+				sendHeader(out, status, filePath);
 				out.flush();
 				System.out.println("Response to PUT : data sent");
 			} catch (Exception e) {
-				sendHeader(out,"500 Internal Server Error", filePath);
-				out.flush();
+				ArrayList<String> content = readFile(INTERNAL_ERROR);
+	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
+	        	sendBody(out, content);
 				System.err.println("Error in WebServer while puting ressource:" + e);
 			}
 	  }
@@ -300,11 +306,12 @@ public class WebServer {
 	  //private void requestDELETE(BufferedOutputStream out, String filePath) {
 	  private void requestDELETE(PrintWriter out, String filePath) {
 		  try {
+
+				System.out.println("DELETE request received");
 				File toDelete = new File(filePath);
 
 				boolean deleted = false;
 				boolean existed = false;
-				System.out.println("DELETE request received");
 				//Check that it is the filePath to a correct filre
 				if((existed = toDelete.exists()) && toDelete.isFile()) {
 					deleted = toDelete.delete();
@@ -313,14 +320,17 @@ public class WebServer {
 				// Send Header
 				if(deleted) {
 					sendHeader(out,"204 No Content", filePath);
+					out.flush();
 				} else if (!existed) {
-					sendHeader(out,"404 Not Found", filePath);
-				}
-				out.flush();
+					ArrayList<String> content = readFile(NOT_FOUND);
+		  		    sendHeader(out, "404 Not Found", NOT_FOUND);
+		        	sendBody(out, content);
+				} 
 				System.out.println("Response to DELETE : data sent");
 			} catch (Exception e) {
-				sendHeader(out,"500 Internal Server Error", filePath);
-				out.flush();
+				ArrayList<String> content = readFile(INTERNAL_ERROR);
+	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
+	        	sendBody(out, content);
 				System.err.println("Error in WebServer while deleting ressource:" + e);
 			}
 	  }
