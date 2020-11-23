@@ -27,6 +27,7 @@ import java.util.ArrayList;
 public class WebServer { 
 	  /**Path to the home page, to change depending on the path on your computer*/
 	  private static final String INDEX = "/home/camille/git/prog_reseaux/TP-HTTP-Code/doc/index.html";
+	  //private static final String INDEX = "TP-HTTP-Code/doc/index.html";
 
 	  /**
 	   * Creates a socket and waits for connection.
@@ -88,6 +89,7 @@ public class WebServer {
 						        
 							case "POST" :
 								System.out.println("POST request received");
+								requestPOST(out, requestHeaderSplit[1]);
 								break;
 								
 							case "HEAD" :
@@ -97,6 +99,7 @@ public class WebServer {
 								
 							case "PUT" :
 								System.out.println("PUT request received");
+								requestPUT(out, requestHeaderSplit[1]);
 								break;
 								
 							case "DELETE" :
@@ -179,10 +182,10 @@ public class WebServer {
 					sendHeader(out,"204 No Content");
 				} else if (!existed) {
 					//TODO msg d'erreur 404 not found a faire dans la suite
-					System.out.println("file did not exist");
+					sendHeader(out,"404 Not Found");
 				} else {
 					// TODO si trouvé mais pas supprimé, autre erreur
-					System.out.println("file was not deleted");
+					sendHeader(out,"500 Internal Server Error");
 				}
 				
 				out.flush();
