@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 /**
@@ -26,8 +27,8 @@ import java.util.ArrayList;
  */
 public class WebServer { 
 	  /**Path to the home page, to change depending on the path on your computer*/
-	  private static final String INDEX = "/home/camille/git/prog_reseaux/TP-HTTP-Code/doc/index.html";
-	  //private static final String INDEX = "TP-HTTP-Code/doc/index.html";
+	  //private static final String INDEX = "/home/camille/git/prog_reseaux/TP-HTTP-Code/doc/index.html";
+	  private static final String INDEX = "/Users/camelia/git/prog_reseaux/TP-HTTP-Code/doc/index.html";
 
 	  /**
 	   * Creates a socket and waits for connection.
@@ -81,6 +82,7 @@ public class WebServer {
 		        	  System.out.println("Open index");
 		        	  requestGET(out, INDEX);
 		          } else {
+		        	  String requestBody = "";
 			          switch(requestHeaderSplit[0]) {
 			          		case "GET" :
 								System.out.println("GET request received");
@@ -89,7 +91,8 @@ public class WebServer {
 						        
 							case "POST" :
 								System.out.println("POST request received");
-								requestPOST(out, requestHeaderSplit[1]);
+								requestBody = getRequestBody(in);
+								requestPOST(out, requestHeaderSplit[1], requestBody);
 								break;
 								
 							case "HEAD" :
@@ -99,7 +102,8 @@ public class WebServer {
 								
 							case "PUT" :
 								System.out.println("PUT request received");
-								requestPUT(out, requestHeaderSplit[1]);
+								requestBody = getRequestBody(in);
+								requestPUT(out, requestHeaderSplit[1], requestBody);
 								break;
 								
 							case "DELETE" :
@@ -118,6 +122,17 @@ public class WebServer {
 	      }
 	  }
   
+	  private String getRequestBody(BufferedReader in) throws IOException{
+		  String requestBody = "";
+		  char[] cbuf = new char[1000];
+		  boolean done = false;
+		  while (!done) {
+			  done = in.read(cbuf) > -1;
+			  requestBody += new String(cbuf);
+		  }
+		  return requestBody;
+	  }
+	  
 	  private void requestGET(PrintWriter out, String filePath) {
 			Path path = Paths.get(filePath);
 	        ArrayList<String> content = new ArrayList<String>();
@@ -141,8 +156,27 @@ public class WebServer {
             System.out.println("Response to GET : data sent");
 	  }
 	  
-	  private void requestPOST(PrintWriter out, String filePath) {
-			
+	  private void requestPOST(PrintWriter out, String filePath, String requestBody) {
+		  try {
+
+			  	if (requestBody.isEmpty()) {
+			  		sendHeader(out,"400 Bad Request");
+			  		return;
+			  	}
+				Path path = Paths.get(filePath);
+				if (!Files.exists(path)){
+	                Files.createFile(path);
+	            }
+
+				Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
+				sendHeader(out,"200 OK");
+
+				out.flush();
+				System.out.println("Response to POST : data sent");
+			} catch (Exception e) {
+				sendHeader(out,"500 Internal Server Error");
+				System.err.println("Error in WebServer while posting ressource:" + e);
+			}
 	  }
 	  
 	  private void requestHEAD(PrintWriter out, String filePath) {
@@ -162,8 +196,28 @@ public class WebServer {
           System.out.println("Response to HEAD : data sent");
 	  }
 	  
-	  private void requestPUT(PrintWriter out, String filePath) {
-			
+	  private void requestPUT(PrintWriter out, String filePath, String requestBody) {
+		  try {
+
+			  	if (requestBody.isEmpty()) {
+			  		sendHeader(out,"400 Bad Request");
+			  		return;
+			  	}
+				Path path = Paths.get(filePath);
+
+				if (!Files.exists(path)){
+	                Files.createFile(path);
+	            }
+
+				Files.write(path, requestBody.getBytes(), StandardOpenOption.CREATE);
+				sendHeader(out,"200 OK");
+
+				out.flush();
+				System.out.println("Response to PUT : data sent");
+			} catch (Exception e) {
+				sendHeader(out,"500 Internal Server Error");
+				System.err.println("Error in WebServer while puting ressource:" + e);
+			}
 	  }
 	  
 	  private void requestDELETE(PrintWriter out, String filePath) {
