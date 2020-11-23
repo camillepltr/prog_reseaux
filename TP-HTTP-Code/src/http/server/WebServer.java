@@ -18,11 +18,10 @@ import java.util.ArrayList;
  * WebServer is a very simple web-server. Any request is responded with a very
  * simple web-page.
  * 
- * @author Jeff Heaton, Camille Peltier, Camélia Guerraoui
+ * @author Camille Peltier, Camélia Guerraoui
  * @version 1.2
  */
 public class WebServer { 
-	  /**Path to the home page, to change depending on the path on your computer*/
 	  private static final String INDEX = "doc/index.html";
 	  private static final String BAD_REQUEST = "doc/400_Bad_Request.html";
 	  private static final String NOT_FOUND = "doc/404_Not_Found.html";
@@ -123,6 +122,12 @@ public class WebServer {
 	      }
 	  }
   
+	  /**
+	   * Get the request's body 
+	   * @param in the input stream to get the body from
+	   * @return a string representation of the request's body
+	   * @throws IOException
+	   */
 	  private String getRequestBody(BufferedReader in) throws IOException{
 		  String requestBody = "";
 		  char[] cbuf = new char[1000];
@@ -134,6 +139,11 @@ public class WebServer {
 		  return requestBody;
 	  }
 	  
+	  /**
+	   * Read a local file
+	   * @param filePath the filepath to the file to read
+	   * @return an array of strings representing the content of the file
+	   */
 	  private ArrayList<String> readFile(String filePath) {
 		  ArrayList<String> content = new ArrayList<String>();
 
@@ -150,17 +160,22 @@ public class WebServer {
 			  return null;
 		  }
 		  
-	}
+	  }
 
-	private void sendBody(PrintWriter out, ArrayList<String> content) {
-		  // Send the response's body
-		 if(content != null) {
+	  /**
+	   * Send the body, i.e. write the body's content in the output stream
+	   * @param out the PrintWriter to write in
+	   * @param content an array containt the Strings to write
+	   */
+	  private void sendBody(PrintWriter out, ArrayList<String> content) {
+			if(content != null) {
+			//Write each line
 			  for(String line : content) {
 				  out.println(line);
 			  }
-			  out.flush();
-		 }
-	}
+				  out.flush();
+			}
+		}
 	  
 	  /*private void requestGET(BufferedOutputStream out, String filePath){
 	        long size = -1;
@@ -191,78 +206,106 @@ public class WebServer {
             System.out.println("Response to GET : data sent");
 	  }*/
 	  
-	  private void requestGET(PrintWriter out, String filePath) {
-			Path path = Paths.get(filePath);
-			String status = "200 OK";
-	      
-	        try {
-	        	if (!Files.exists(path)) {
-	        		path = Paths.get(NOT_FOUND);
-	        		filePath = NOT_FOUND;
-	        		status = "404 Not Found";
-				}
-	        	
-	        	ArrayList<String> content = readFile(filePath);
-	  		    sendHeader(out, Files.size(path), status, filePath);
-	        	sendBody(out, content);
-
-	 	        System.out.println("Response to GET : data sent");
-	        } catch (Exception e) {
-				ArrayList<String> content = readFile(INTERNAL_ERROR);
-	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-	        	sendBody(out, content);
-	            System.err.println("Error in WebServer while loading ressource:" + e);
-	        }
-	  }
-	  
-	  //private void requestPOST(BufferedOutputStream out, String filePath, String requestBody) {
-	  private void requestPOST(PrintWriter out, String filePath, String requestBody) {
-		  try {
-			  Path path = Paths.get(filePath);
-			  	if (requestBody.isEmpty()) {
-			  		ArrayList<String> content = readFile(BAD_REQUEST);
-		  		    sendHeader(out, "400 Bad Request", BAD_REQUEST);
+		/**
+		 * Method called to treat a HTTP GET request
+		 * @param out the PrintWriter to write the response to
+		 * @param filePath the file path to the requested file
+		 */
+		  private void requestGET(PrintWriter out, String filePath) {
+			  	//initial path and status
+				Path path = Paths.get(filePath);
+				String status = "200 OK";
+		      
+		        try {
+		        	if (!Files.exists(path)) {
+		        		//Change the path to send the 404_Not_Found page and change status code
+		        		path = Paths.get(NOT_FOUND);
+		        		filePath = NOT_FOUND;
+		        		status = "404 Not Found";
+					}
+		        	
+		        	//Read requested file, send response header and body
+		        	ArrayList<String> content = readFile(filePath);
+		  		    sendHeader(out, Files.size(path), status, filePath);
 		        	sendBody(out, content);
-			  		return;
-			  	}
-
-				if (!Files.exists(path)){
-	                Files.createFile(path);
-	                Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
-					sendHeader(out,"201 Created", filePath);
-	            } else {
-					Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
-					sendHeader(out,"200 OK", filePath);
-	            }
-
-				out.flush();
-				System.out.println("Response to POST : data sent");
-			} catch (Exception e) {
-				ArrayList<String> content = readFile(INTERNAL_ERROR);
-	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-	        	sendBody(out, content);
-				System.err.println("Error in WebServer while posting ressource:" + e);
-			}
-	  }
+	
+		 	        System.out.println("Response to GET : data sent");
+		        } catch (Exception e) {
+		        	//Send 500_Internal_Error page
+					ArrayList<String> content = readFile(INTERNAL_ERROR);
+		  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
+		        	sendBody(out, content);
+		            System.err.println("Error in WebServer while loading ressource:" + e);
+		        }
+		  }
+		  
+	  //private void requestPOST(BufferedOutputStream out, String filePath, String requestBody) {
+		  
+		  /**
+		   * Method called to treat a HTTP POST request
+		   * @param out the PrintWriter to write the response to
+		   * @param filePath the path to the requested file
+		   * @param requestBody a String representation of the request's body, needed to trea the POST request
+		   */
+		  private void requestPOST(PrintWriter out, String filePath, String requestBody) {
+			  try {
+				  Path path = Paths.get(filePath);
+				  	if (requestBody.isEmpty()) {
+				  		//If there is nothing in the request's body, send a BAD REQUEST response
+				  		ArrayList<String> content = readFile(BAD_REQUEST);
+			  		    sendHeader(out, "400 Bad Request", BAD_REQUEST);
+			        	sendBody(out, content);
+				  		return;
+				  	}
+	
+				  	//Create new file containing the request's body or append it to an existing file
+					if (!Files.exists(path)){
+		                Files.createFile(path);
+		                Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
+						sendHeader(out,"201 Created", filePath);
+		            } else {
+						Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
+						sendHeader(out,"200 OK", filePath);
+		            }
+	
+					out.flush();
+					System.out.println("Response to POST : data sent");
+				} catch (Exception e) {
+					//Send 500_Internal_Error page
+					ArrayList<String> content = readFile(INTERNAL_ERROR);
+		  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
+		        	sendBody(out, content);
+					System.err.println("Error in WebServer while posting ressource:" + e);
+				}
+		  }
 	  
 	  //private void requestHEAD(BufferedOutputStream out, String filePath) {
+	  /**
+	   * Method called to treat a HTTP HEAD request
+	   * @param out the PrintWriter to write the response to
+	   * @param filePath the file path to the requested file
+	   */
 	  private void requestHEAD(PrintWriter out, String filePath) {
+		  	//initial path and status
 		    Path path = Paths.get(filePath);
 			String status = "200 OK";
 	      
 	        try {
 	        	if (!Files.exists(path)) {
+	        		//Change the path to send the 404_Not_Found page and change status code
 	        		path = Paths.get(NOT_FOUND);
 	        		filePath = NOT_FOUND;
 	        		status = "404 Not Found";
 				}
 	        	
+	        	//Read requested file, send response header
 	        	ArrayList<String> content = readFile(filePath);
 	  		    sendHeader(out, Files.size(path), status, filePath);
 	  		    out.flush();
 
 	 	        System.out.println("Response to HEAD : data sent");
 	        } catch (Exception e) {
+	        	//Send 500_Internal_Error page
 				ArrayList<String> content = readFile(INTERNAL_ERROR);
 	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
 	        	sendBody(out, content);
@@ -272,18 +315,26 @@ public class WebServer {
 	  }
 	  
 	  //private void requestPUT(BufferedOutputStream out, String filePath, String requestBody) {
+	  /**
+	   * Method called to treat a HTTP PUT request
+	   * @param out the PrintWriter to write the response to
+	   * @param filePath the path to the requested file
+	   * @param requestBody a String representation of the request's body, needed to treat the PUT request
+	   */
 	  private void requestPUT(PrintWriter out, String filePath, String requestBody) {
 		  
 		  try {
 			    Path path = Paths.get(filePath);
 			    String status = "200 OK";
 			  	if (requestBody.isEmpty()) {
+			  		//If there is nothing in the request's body, send a BAD REQUEST response
 			  		ArrayList<String> content = readFile(BAD_REQUEST);
 		  		    sendHeader(out, "400 Bad Request", BAD_REQUEST);
 		        	sendBody(out, content);
 			  		return;
 			  	}
 
+			  //Create new file containing the request's body; if the file already exists replace it
 				if (!Files.exists(path)){
 	                Files.createFile(path);
 	                Files.write(path, requestBody.getBytes(), StandardOpenOption.CREATE);
@@ -296,6 +347,7 @@ public class WebServer {
 				out.flush();
 				System.out.println("Response to PUT : data sent");
 			} catch (Exception e) {
+				//Send 500_Internal_Error page
 				ArrayList<String> content = readFile(INTERNAL_ERROR);
 	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
 	        	sendBody(out, content);
@@ -304,6 +356,11 @@ public class WebServer {
 	  }
 	  
 	  //private void requestDELETE(BufferedOutputStream out, String filePath) {
+	  /**
+	   * Method called to treat a HTTP DELETE request
+	   * @param out the PrintWriter to write the response to
+	   * @param filePath the file path to the requested file
+	   */
 	  private void requestDELETE(PrintWriter out, String filePath) {
 		  try {
 
@@ -319,15 +376,18 @@ public class WebServer {
 				
 				// Send Header
 				if(deleted) {
+					//Success
 					sendHeader(out,"204 No Content", filePath);
 					out.flush();
 				} else if (!existed) {
+					//Case where the requested file does not exist
 					ArrayList<String> content = readFile(NOT_FOUND);
 		  		    sendHeader(out, "404 Not Found", NOT_FOUND);
 		        	sendBody(out, content);
 				} 
 				System.out.println("Response to DELETE : data sent");
 			} catch (Exception e) {
+				//Send 500_Internal_Error page
 				ArrayList<String> content = readFile(INTERNAL_ERROR);
 	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
 	        	sendBody(out, content);
@@ -339,40 +399,32 @@ public class WebServer {
 		  String type = "";
 		  if (filePath.endsWith(".html")) {
 			  type = "text/html";
+		  } else if (filePath.endsWith(".txt")) {
+			  type = "text/txt";
 		  } else if (filePath.endsWith(".jpeg")) {
 			  type = "image/jpeg";
 		  } else if (filePath.endsWith(".png")) {
 			  type = "image/png";
+		  } else if (filePath.endsWith(".gif")) {
+			  type = "image/gif";
+		  } else if (filePath.endsWith(".jpg")) {
+			  type = "image/jpg";
+		  } else if (filePath.endsWith(".svg")) {
+			  type = "image/svg";
+		  } else if (filePath.endsWith(".mp3")) {
+			  type = "audio/mp3";
+		  } else if (filePath.endsWith(".mpeg")) {
+			  type = "video/mpeg";
+		  } else if (filePath.endsWith(".mp4")) {
+			  type = "video/mp4";
+		  } else if (filePath.endsWith(".pdf")) {
+			  type = "application/pdf";
+		  } else if (filePath.endsWith(".xml")) {
+			  type = "application/xml";
+		  } else if (filePath.endsWith(".zip")) {
+			  type = "application/zip";
 		  }
 		  
-		  /*String[] filePathSplitted = new String[2];
-		  filePathSplitted = filePath.split(".");
-		  System.out.println(filePathSplitted.length-1);
-		  String extension = filePathSplitted[filePathSplitted.length-1];
-		  String type = "";
-		  switch(extension) {
-		  		case "jpg" :
-		  		case "svg" :
-		  		case "png" :
-		  			type = "image/"+extension;
-		  			break;
-		  		case "html" :
-		  		case "txt" :
-		  			type = "text/"+extension;
-		  			break;
-		  		case "mp4" :
-		  		case "mpeg" :
-		  			type = "video/"+extension;
-		  			break;
-		  		case "mp3" :
-		  			type = "audio/"+extension;
-		  			break;
-		  		case "zip" :
-		  		case "xml" :
-		  		case "pdf" :
-		  			type = "application/"+extension;
-		  			break;
-		  }*/
 		  return type;
 	  }
 	  
