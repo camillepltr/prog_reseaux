@@ -13,9 +13,9 @@
 		<button onclick="testPOST('file_post')">Submit using POST</button>
         <script>
             testPOST = function(entry) {
-				var url = document.getElementById(entry).value;
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.open("POST", "testPost.html", true); 
+				let url = document.getElementById(entry).value;
+                let xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("POST", url, true); 
                 xmlhttp.send("Interessant\r\n"); 
                 xmlhttp.onreadystatechange=function() {
 	                if(xmlhttp.readyState==4) { 
@@ -23,60 +23,59 @@
 	                }
                 }
             }
+
+            testHEAD = function(entry) {
+            
+                let url = document.getElementById(entry).value;
+                let xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("HEAD", url, true); 
+                xmlhttp.onreadystatechange=function() {
+                    if(xmlhttp.readyState==4) { 
+                        console.log(xmlhttp.getAllResponseHeaders());
+                    }
+                }
+                xmlhttp.send(null); 
+            }
+
+            testDELETE = function(entry) {
+            
+                let url = document.getElementById(entry).value;
+                console.log(url);
+                let xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("DELETE", url, true); 
+                xmlhttp.onreadystatechange=function() {
+                    if(xmlhttp.readyState==4) { 
+                        console.log(xmlhttp.getAllResponseHeaders());
+                    }
+                }
+                xmlhttp.send(null); 
+            }
+
+            testPUT = function(entry) {
+                let url = document.getElementById(entry).value;
+                let xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("PUT", url, true); 
+                xmlhttp.send("Changement2\r\n"); 
+                xmlhttp.onreadystatechange=function() {
+                    if(xmlhttp.readyState==4) { 
+                        console.log(xmlhttp.getAllResponseHeaders());
+                    }
+                }
+            }
         </script>
 
         <h2>HEAD</h2>
         Enter the path of a file to test HEAD request on : <input id="file_head" >
         <button onclick="testHEAD('file_head')">Submit using HEAD</button>
-        <script>
-            testHEAD = function(entry) {
-            
-                var url = document.getElementById(entry).value;
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.open("HEAD", "index.html", true); 
-                xmlhttp.onreadystatechange=function() {
-                    if(xmlhttp.readyState==4) { 
-                        console.log(xmlhttp.getAllResponseHeaders());
-                    }
-                }
-                xmlhttp.send(null); 
-            }
-        </script>
 
         <h2>DELETE</h2>
         Enter the path of a file to test DELETE request on : <input id="file_delete" >
         <button onclick="testDELETE('file_delete')">Submit using DELETE</button>
-        <script>
-            testDELETE = function(entry) {
-            
-                var url = document.getElementById(entry).value;
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.open("DELETE", "BonjourCamille.html", true); 
-                xmlhttp.onreadystatechange=function() {
-                    if(xmlhttp.readyState==4) { 
-                        console.log(xmlhttp.getAllResponseHeaders());
-                    }
-                }
-                xmlhttp.send(null); 
-            }
-        </script>
         
         <h2>PUT</h2>
         Enter the path of a file to test PUT request on : <input id="file_put" >
 		<button onclick="testPUT('file_put')">Submit using PUT</button>
-        <script>
-            testPUT = function(entry) {
-				var url = document.getElementById(entry).value;
-                var xmlhttp = new XMLHttpRequest();
-                xmlhttp.open("PUT", "BonjourCamille.html", true); 
-                xmlhttp.send("Changement2\r\n"); 
-                xmlhttp.onreadystatechange=function() {
-	                if(xmlhttp.readyState==4) { 
-	                    console.log(xmlhttp.getAllResponseHeaders());
-	                }
-                }
-            }
-        </script>
+
         
 
 
