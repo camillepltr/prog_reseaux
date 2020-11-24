@@ -23,9 +23,9 @@ import java.util.ArrayList;
  */
 public class WebServer { 
 	  private static final String INDEX = "doc/index.html";
-	  private static final String BAD_REQUEST = "doc/400_Bad_Request.html";
-	  private static final String NOT_FOUND = "doc/404_Not_Found.html";
-	  private static final String INTERNAL_ERROR = "doc/500_Internal_Error.html";
+	  private static final String BAD_REQUEST = "doc/Error_Pages/400_Bad_Request.html";
+	  private static final String NOT_FOUND = "doc/Error_Pages/404_Not_Found.html";
+	  private static final String INTERNAL_ERROR = "doc/Error_Pages/500_Internal_Error.html";
 
 	  /**
 	   * Creates a socket and waits for connection.
@@ -81,6 +81,7 @@ public class WebServer {
 		        	  requestGET(out, INDEX);
 		          } else {
 		        	  String requestBody = "";
+		        	  
 			          switch(requestHeaderSplit[0]) {
 			          		case "GET" :
 								System.out.println("GET request received");
@@ -126,7 +127,8 @@ public class WebServer {
 	   * Get the request's body 
 	   * @param in the input stream to get the body from
 	   * @return a string representation of the request's body
-	   * @throws IOException
+	   * @throws IOException Signals that an I/O exception of some sort has occurred.
+	   * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
 	   */
 	  private String getRequestBody(BufferedReader in) throws IOException{
 		  String requestBody = "";
@@ -147,7 +149,6 @@ public class WebServer {
 	  private ArrayList<String> readFile(String filePath) {
 		  ArrayList<String> content = new ArrayList<String>();
 
-		  // read the requested file
 		  try {
 			  BufferedInputStream inFile = new BufferedInputStream(new FileInputStream(filePath));
 			  byte[] cbuf = new byte[1000];
@@ -169,10 +170,9 @@ public class WebServer {
 	   */
 	  private void sendBody(PrintWriter out, ArrayList<String> content) {
 			if(content != null) {
-			//Write each line
-			  for(String line : content) {
-				  out.println(line);
-			  }
+				for(String line : content) {
+					out.println(line);
+				}
 				  out.flush();
 			}
 		}
@@ -239,8 +239,6 @@ public class WebServer {
 		        }
 		  }
 		  
-	  //private void requestPOST(BufferedOutputStream out, String filePath, String requestBody) {
-		  
 		  /**
 		   * Method called to treat a HTTP POST request
 		   * @param out the PrintWriter to write the response to
@@ -279,8 +277,7 @@ public class WebServer {
 				}
 		  }
 	  
-	  //private void requestHEAD(BufferedOutputStream out, String filePath) {
-	  /**
+	   /**
 	   * Method called to treat a HTTP HEAD request
 	   * @param out the PrintWriter to write the response to
 	   * @param filePath the file path to the requested file
@@ -314,7 +311,6 @@ public class WebServer {
 
 	  }
 	  
-	  //private void requestPUT(BufferedOutputStream out, String filePath, String requestBody) {
 	  /**
 	   * Method called to treat a HTTP PUT request
 	   * @param out the PrintWriter to write the response to
@@ -355,7 +351,6 @@ public class WebServer {
 			}
 	  }
 	  
-	  //private void requestDELETE(BufferedOutputStream out, String filePath) {
 	  /**
 	   * Method called to treat a HTTP DELETE request
 	   * @param out the PrintWriter to write the response to
@@ -429,7 +424,6 @@ public class WebServer {
 		  } else if (filePath.endsWith(".zip")) {
 			  type = "application/zip";
 		  }
-		  
 		  return type;
 	  }
 	  
