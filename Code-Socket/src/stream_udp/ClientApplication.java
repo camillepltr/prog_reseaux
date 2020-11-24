@@ -21,14 +21,25 @@ public class ClientApplication {
     /**
     * Initializes the server port, the server name, the group name and the client's pseudo
     * Creates a User Interface for the client to chat
-    * @param args unused parameters
+    * @param args the command line's arguments : server name, server port et server group to use
 	* @throws IOException Signals that an I/O exception of some sort has occurred.
     * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
     * @see ClientInterface
     */
     public static void main(String[] args) throws IOException {
+    	/*
+        if (args.length != 3) {
+            System.out.println("Usage: java ClientInterface <Server name> <Server port> <Server group>, i.e. java ClientInterface localhost 3500 228.5.6.7");
+            System.exit(1);
+        }
         // Server's Parameters 
-        final int SERVER_PORT = 3500; 
+        final String SERVER_NAME = args[0];
+        final int SERVER_PORT = new Integer(args[1]).intValue(); 
+        final String GROUP_NAME = args[2];
+        */
+    	
+        // Server's Parameters 
+        final int SERVER_PORT = 3500;
         final String SERVER_NAME = "localhost";
         final InetAddress SERVER_ADDRESS = InetAddress.getByName(SERVER_NAME);
         

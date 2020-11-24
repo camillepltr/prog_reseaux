@@ -21,7 +21,7 @@ public class EchoServerMultiThreaded  {
   	* Main Method :
     *   - connects the client to the server using the UDP Protocol.
     *   - transmits messages from a client to the rest of his group
-    * @param args unused parameters
+    * @param args the Command line's arguments : port and group to use
  	* @throws AlreadyBoundException An AlreadyBoundException is thrown if an attempt 
  	* 			is made to bind an object in the registry to a name that already has an associated binding.
  	* @throws IOException Signals that an I/O exception of some sort has occurred.
@@ -30,6 +30,16 @@ public class EchoServerMultiThreaded  {
     public static void main(String args[]) throws IOException, AlreadyBoundException { 
         
         System.out.println("Server Launched");
+        
+        /*
+        if (args.length != 2) {
+            System.out.println("Usage: java EchoSererMultiThreaded <Port> <Group>, i.e. java EchoServerMultiThreaded 3500 228.5.6.7");
+            System.exit(1);
+        }
+        // Server's Parameters 
+        final int SERVER_PORT = new Integer(args[0]).intValue(); 
+        final String GROUP_NAME = args[1]; 
+        */
 
         //Parameters
         final int SERVER_PORT = 3500;

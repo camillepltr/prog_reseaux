@@ -478,7 +478,7 @@ public class WebServer {
 	  
 	  /**
 	   * Start the application.
-	   * @param args Command line's first argument is the server port
+	   * @param args Command line's arguments, the first argument is the server port
 	   */
 	  public static void main(String args[]) {
 		  	if (args.length != 1) {
