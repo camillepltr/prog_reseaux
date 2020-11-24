@@ -91,7 +91,7 @@ public class WebServer {
 		          // Default : open index.html
 		          if(requestHeaderSplit[1].equals("/")) {
 		        	  System.out.println("Open index");
-		        	  requestGET(out, resourcesDirectory+INDEX);
+		        	  requestGET(out, resourcesDirectory+"/"+INDEX);
 		          } else {
 		        	  String requestBody = "";
 		        	  String filePath = resourcesDirectory+requestHeaderSplit[1];
@@ -259,7 +259,7 @@ public class WebServer {
 	   */
 	  private void sendError(OutputStream out, String status, String filePath) {
 		  try {
-			  filePath = resourcesDirectory + filePath;
+			  filePath = resourcesDirectory +"/"+ filePath;
 			  Path p = Paths.get(filePath);
 			  long size = Files.size(p);
 			  byte[] content = readFile(filePath, (int)size);
