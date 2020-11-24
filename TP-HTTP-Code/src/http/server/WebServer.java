@@ -199,213 +199,6 @@ public class WebServer {
           }
 		  return image;
 	  }
-
-	  /**
-	   * Sends the response's header.
-	   * First sendHeader method, when there is a content length to add to the header
-	   * @param out socket's output i.e. the stream where the data should be sent
-	   * @param size content length
-	   * @param responseStatus response's status according to the HTTP Protocol
-	   * @param filePath a String reprentation of the path to the requested file
-	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
-	   */
-	  private void sendHeader(OutputStream out, long size, String responseStatus, String filePath) throws IOException{
-		  String type = getContentType(filePath);
-		  String header = "HTTP/1.0 " + responseStatus + "\r\n";
-		  header += "Content-Type: "+type+"; charset=UTF-8\r\n";
-		  header += "Content-Length : " + size +"\r\n";
-		  header += "Server: Bot\r\n";
-          // this blank line signals the end of the headers
-		  header += "\r\n";
-		  System.out.println(header);
-		  out.write(header.getBytes());
-	  }
-	  
-	  /**
-	   * Sends the response's header.
-	   * Second sendHeader method, when there is no content length to add to the header
-	   * @param out socket's output i.e. the stream where the data should be sent
-	   * @param responseStatus response's status according to the HTTP Protocol
-	   * @param filePath a String reprentation of the path to the requested file
-	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
-	   */
-	  private void sendHeader(OutputStream out, String responseStatus, String filePath) throws IOException{
-		  String type = getContentType(filePath);
-		  String header = "HTTP/1.0 " + responseStatus +"\r\n";
-		  header += "Content-Type: "+type+"; charset=UTF-8\r\n";
-		  header += "Server: Bot\r\n";
-          // this blank line signals the end of the headers
-		  header += "\r\n";
-		  System.out.println(header);
-		  out.write(header.getBytes());
-	  }
-	  
-	  /**
-	   * Send a Response's Body by using an ouput stream connected to a specific socket.
-	   * @param out Output Stream connected to the socket
-	   * @param content byte table containing datas i.e. the file to send.
-	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
-	   */
-	  private void sendBody(OutputStream out, byte[]content) throws IOException {
-		  out.write(content, 0, content.length);
-		  out.flush();
-	  }
-	  
-	  /**
-	   * Redirect on an internal error page when a error occures.
-	   * @param out Output Stream connected to the socket used to write the response
-	   * @param status Status of the found error
-	   * @param filePath path to the internal error page (HTML Page)
-	   */
-	  private void sendError(OutputStream out, String status, String filePath) {
-		  try {
-			  filePath = resourcesDirectory +"/"+ filePath;
-			  Path p = Paths.get(filePath);
-			  long size = Files.size(p);
-			  byte[] content = readFile(filePath, (int)size);
-			  sendHeader(out, status, filePath);
-	      	  sendBody(out, content);
-	          System.err.println("Error in WebServer");
-		  } catch (Exception e) {
-			  e.printStackTrace();
-		  }
-	  }
-
-	/**
-	 * Method called to treat a HTTP GET request
-	 * @param out the OutputStream to write the response
-	 * @param filePath the file path to the requested file
-	 */
-	  private void requestGET(OutputStream out, String filePath) {
-		  Path path = Paths.get(filePath);
-		  try {
-			  if (!Files.exists(path)) {
-				  sendError(out, "404 Not Found", NOT_FOUND);
-				  return;
-			  }
-			  long size = Files.size(path);
-			  byte [] bytesRead = readFile(filePath, (int)size);
-			  sendHeader(out, size, "200 OK", filePath);
-			  sendBody(out, bytesRead);
-
-			  System.out.println("Response to GET : data sent");
-		  } catch (Exception e) {
-			  sendError(out, "500 Internal Error", INTERNAL_ERROR);
-		  }
-	  }
-		  
-	  /**
-	   * Method called to treat a HTTP POST request
-	   * @param out the OutputStream to write the responses
-	   * @param filePath the path to the requested file
-	   * @param requestBody a String representation of the request's body, needed to treat the POST request
-	   */
-	  private void requestPOST(OutputStream out, String filePath, String requestBody) {
-		  try {
-			  Path path = Paths.get(filePath);
-			  	if (requestBody.isEmpty()) {
-			  		sendError(out, "400 Bad Request", BAD_REQUEST);
-			  		return;
-			  	}
-			  	//Create new file containing the request's body or append it to an existing file
-				if (!Files.exists(path)){
-	                Files.createFile(path);
-	                Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
-					sendHeader(out,"201 Created", filePath);
-	            } else {
-					Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
-					sendHeader(out,"200 OK", filePath);
-	            }
-				out.flush();
-				System.out.println("Response to POST : data sent");
-			} catch (Exception e) {
-				sendError(out, "500 Internal Error", INTERNAL_ERROR);
-			}
-	  }
-	  
-	   /**
-	   * Method called to treat a HTTP HEAD request
-	   * @param out the OutputStream to write the response
-	   * @param filePath the file path to the requested file
-	   */
-	  private void requestHEAD(OutputStream out, String filePath) {
-		    Path path = Paths.get(filePath);
-	        try {
-	        	if (!Files.exists(path)) {
-	        		sendError(out, "404 Not Found", NOT_FOUND);
-					return;
-				}
-	        	//Send response header
-	        	long size = Files.size(path);
-	  		    sendHeader(out, size, "200 OK", filePath);
-	  		    out.flush();
-	 	        System.out.println("Response to HEAD : data sent");
-	        } catch (Exception e) {
-	        	sendError(out, "500 Internal Error", INTERNAL_ERROR);
-	        }
-	  }
-	  
-	  /**
-	   * Method called to treat a HTTP PUT request
-	   * @param out the OutputStream to write the response
-	   * @param filePath the path to the requested file
-	   * @param requestBody a String representation of the request's body, needed to treat the PUT request
-	   */
-	  private void requestPUT(OutputStream out, String filePath, String requestBody) {
-		  try {
-			    Path path = Paths.get(filePath);
-			    String status = "200 OK";
-			  	if (requestBody.isEmpty()) {
-			  		//If there is nothing in the request's body, send a BAD REQUEST response
-			  		sendError(out, "400 Bad Request", BAD_REQUEST);
-			  		return;
-			  	}
-			  	//Create new file containing the request's body; if the file already exists replace it
-				if (!Files.exists(path)){
-	                Files.createFile(path);
-	                Files.write(path, requestBody.getBytes(), StandardOpenOption.CREATE);
-					status = "201 Created";
-	            } else {
-					Files.write(path, requestBody.getBytes(), StandardOpenOption.WRITE);
-	            }
-				sendHeader(out, status, filePath);
-				out.flush();
-				System.out.println("Response to PUT : data sent");
-			} catch (Exception e) {
-				sendError(out, "500 Internal Error", INTERNAL_ERROR);
-			}
-	  }
-	  
-	  /**
-	   * Method called to treat a HTTP DELETE request
-	   * @param out the OutputStream to write the response
-	   * @param filePath the file path to the requested file
-	   */
-	  private void requestDELETE(OutputStream out, String filePath) {
-		  try {
-			  File toDelete = new File(filePath);
-
-			  boolean deleted = false;
-			  boolean existed = false;
-			  //Check that it is the filePath to a correct file
-			  if((existed = toDelete.exists()) && toDelete.isFile()) {
-				  deleted = toDelete.delete();
-			  }
-
-			  if(deleted) {
-				  //It's a success, we send the header
-				  sendHeader(out,"204 No Content", filePath);
-				  out.flush();
-			  } else if (!existed) {
-				  //Case where the requested file does not exist
-				  sendError(out, "404 Not Found", NOT_FOUND);
-				  return;
-			  } 
-			  System.out.println("Response to DELETE : data sent");
-		  } catch (Exception e) {
-			  sendError(out, "500 Internal Error", INTERNAL_ERROR);
-		  }
-	  }
 	  
 	  /**
 	   * Get the Content-Type for the response header depending on the file extension
@@ -443,44 +236,220 @@ public class WebServer {
 		  }
 		  return type;
 	  }
-	  
-	  /**
-	   * Send the body, i.e. write the body's content in the output stream
-	   * @param out the PrintWriter to write in
-	   * @param content an array containt the Strings to write
-	   * @deprecated
-	   */
-	  	@Deprecated
-	  	private void sendBody(PrintWriter out, ArrayList<String> content) {
-			if(content != null) {
-				for(String line : content) {
-					out.println(line);
-				}
-				  out.flush();
-			}
-		}
-	  
-	  /**
-	   * Read a local file (text file
-	   * @param filePath the filepath to the file to read
-	   * @return an array of strings representing the content of the file
-	   * @deprecated
-	   */
-	  @Deprecated
-	  private ArrayList<String> readFile(String filePath) {
-		  ArrayList<String> content = new ArrayList<String>();
 
-		  try {
-			  BufferedInputStream inFile = new BufferedInputStream(new FileInputStream(filePath));
-			  byte[] cbuf = new byte[1000];
-			  while (inFile.read(cbuf) > -1) {
-				  content.add(new String(cbuf));
-			  }
-			  return content;
-		  } catch (Exception e) {
-			  System.err.println("Error in WebServer while reading a ressource:" + e);
-			  return null;
-		  }
-		  
+	  /**
+	   * Sends the response's header.
+	   * First sendHeader method, when there is a content length to add to the header
+	   * @param out socket's output i.e. the stream where the data should be sent
+	   * @param size content length
+	   * @param responseStatus response's status according to the HTTP Protocol
+	   * @param filePath a String reprentation of the path to the requested file
+	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
+	   */
+	  private void sendHeader(OutputStream out, long size, String responseStatus, String type) throws IOException{
+		  String header = "HTTP/1.0 " + responseStatus + "\r\n";
+		  header += "Content-Type: "+type+"; charset=UTF-8\r\n";
+		  header += "Content-Length : " + size +"\r\n";
+		  header += "Server: Bot\r\n";
+          // this blank line signals the end of the headers
+		  header += "\r\n";
+		  System.out.println(header);
+		  out.write(header.getBytes());
 	  }
+	  
+	  /**
+	   * Sends the response's header.
+	   * Second sendHeader method, when there is no content length to add to the header
+	   * @param out socket's output i.e. the stream where the data should be sent
+	   * @param responseStatus response's status according to the HTTP Protocol
+	   * @param filePath a String reprentation of the path to the requested file
+	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
+	   */
+	  private void sendHeader(OutputStream out, String responseStatus) throws IOException{
+		  String header = "HTTP/1.0 " + responseStatus +"\r\n";
+		  header += "Server: Bot\r\n";
+          // this blank line signals the end of the headers
+		  header += "\r\n";
+		  System.out.println(header);
+		  out.write(header.getBytes());
+	  }
+	  
+	  /**
+	   * Send a Response's Body by using an ouput stream connected to a specific socket.
+	   * @param out Output Stream connected to the socket
+	   * @param content byte table containing datas i.e. the file to send.
+	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
+	   */
+	  private void sendBody(OutputStream out, byte[]content) throws IOException {
+		  out.write(content, 0, content.length);
+		  out.flush();
+	  }
+	  
+	  /**
+	   * Redirect on an internal error page when a error occures.
+	   * @param out Output Stream connected to the socket used to write the response
+	   * @param status Status of the found error
+	   * @param filePath path to the internal error page (HTML Page)
+	   */
+	  private void sendError(OutputStream out, String status, String filePath) {
+		  try {
+			  filePath = resourcesDirectory +"/"+ filePath;
+			  Path p = Paths.get(filePath);
+			  long size = Files.size(p);
+			  byte[] content = readFile(filePath, (int)size);
+			  String type = getContentType(filePath);
+			  sendHeader(out, size, status, type);
+	      	  sendBody(out, content);
+	          System.err.println("Error in WebServer");
+		  } catch (Exception e) {
+			  e.printStackTrace();
+		  }
+	  }
+
+	/**
+	 * Method called to treat a HTTP GET request
+	 * @param out the OutputStream to write the response
+	 * @param filePath the file path to the requested file
+	 */
+	  private void requestGET(OutputStream out, String filePath) {
+		  Path path = Paths.get(filePath);
+		  try {
+			  if (!Files.exists(path)) {
+				  sendError(out, "404 Not Found", NOT_FOUND);
+				  return;
+			  }
+			  long size = Files.size(path);
+			  byte [] bytesRead = readFile(filePath, (int)size);
+			  String type = getContentType(filePath);
+			  if (type.isEmpty()) {
+	  		    	sendError(out,"501 Not Implemented", NOT_IMPLEMENTED);
+	  		    	return;
+	  		  }
+			  sendHeader(out, size, "200 OK", type);
+			  sendBody(out, bytesRead);
+
+			  System.out.println("Response to GET : data sent");
+		  } catch (Exception e) {
+			  sendError(out, "500 Internal Error", INTERNAL_ERROR);
+		  }
+	  }
+		  
+	  /**
+	   * Method called to treat a HTTP POST request
+	   * @param out the OutputStream to write the responses
+	   * @param filePath the path to the requested file
+	   * @param requestBody a String representation of the request's body, needed to treat the POST request
+	   */
+	  private void requestPOST(OutputStream out, String filePath, String requestBody) {
+		  try {
+			  Path path = Paths.get(filePath);
+			  	if (requestBody.isEmpty()) {
+			  		sendError(out, "400 Bad Request", BAD_REQUEST);
+			  		return;
+			  	}
+			  	//Create new file containing the request's body or append it to an existing file
+				if (!Files.exists(path)){
+	                Files.createFile(path);
+	                Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
+					sendHeader(out,"201 Created");
+	            } else {
+					Files.write(path, requestBody.getBytes(), StandardOpenOption.APPEND);
+					sendHeader(out,"200 OK");
+	            }
+				out.flush();
+				System.out.println("Response to POST : data sent");
+			} catch (Exception e) {
+				sendError(out, "500 Internal Error", INTERNAL_ERROR);
+			}
+	  }
+	  
+	   /**
+	   * Method called to treat a HTTP HEAD request
+	   * @param out the OutputStream to write the response
+	   * @param filePath the file path to the requested file
+	   */
+	  private void requestHEAD(OutputStream out, String filePath) {
+		    Path path = Paths.get(filePath);
+	        try {
+	        	if (!Files.exists(path)) {
+	        		sendError(out, "404 Not Found", NOT_FOUND);
+					return;
+				}
+	        	//Send response header
+	        	long size = Files.size(path);
+	  		    String type = getContentType(filePath);
+	  		    if (type.isEmpty()) {
+	  		    	sendError(out,"501 Not Implemented", NOT_IMPLEMENTED);
+	  		    	return;
+	  		    }
+	  		    sendHeader(out, size, "200 OK", type);
+	  		    out.flush();
+	 	        System.out.println("Response to HEAD : data sent");
+	        } catch (Exception e) {
+	        	sendError(out, "500 Internal Error", INTERNAL_ERROR);
+	        }
+	  }
+	  
+	  /**
+	   * Method called to treat a HTTP PUT request
+	   * @param out the OutputStream to write the response
+	   * @param filePath the path to the requested file
+	   * @param requestBody a String representation of the request's body, needed to treat the PUT request
+	   */
+	  private void requestPUT(OutputStream out, String filePath, String requestBody) {
+		  try {
+			    Path path = Paths.get(filePath);
+			    String status = "200 OK";
+			  	if (requestBody.isEmpty()) {
+			  		//If there is nothing in the request's body, send a BAD REQUEST response
+			  		sendError(out, "400 Bad Request", BAD_REQUEST);
+			  		return;
+			  	}
+			  	//Create new file containing the request's body; if the file already exists replace it
+				if (!Files.exists(path)){
+	                Files.createFile(path);
+	                Files.write(path, requestBody.getBytes(), StandardOpenOption.CREATE);
+					status = "201 Created";
+	            } else {
+					Files.write(path, requestBody.getBytes(), StandardOpenOption.WRITE);
+	            }
+				sendHeader(out, status);
+				out.flush();
+				System.out.println("Response to PUT : data sent");
+			} catch (Exception e) {
+				sendError(out, "500 Internal Error", INTERNAL_ERROR);
+			}
+	  }
+	  
+	  /**
+	   * Method called to treat a HTTP DELETE request
+	   * @param out the OutputStream to write the response
+	   * @param filePath the file path to the requested file
+	   */
+	  private void requestDELETE(OutputStream out, String filePath) {
+		  try {
+			  File toDelete = new File(filePath);
+
+			  boolean deleted = false;
+			  boolean existed = false;
+			  //Check that it is the filePath to a correct file
+			  if((existed = toDelete.exists()) && toDelete.isFile()) {
+				  deleted = toDelete.delete();
+			  }
+
+			  if(deleted) {
+				  //It's a success, we send the header
+				  sendHeader(out,"204 No Content");
+				  out.flush();
+			  } else if (!existed) {
+				  //Case where the requested file does not exist
+				  sendError(out, "404 Not Found", NOT_FOUND);
+				  return;
+			  } 
+			  System.out.println("Response to DELETE : data sent");
+		  } catch (Exception e) {
+			  sendError(out, "500 Internal Error", INTERNAL_ERROR);
+		  }
+	  }
+
 }

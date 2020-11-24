@@ -11,7 +11,8 @@
 
         <h2>POST</h2>
 		Enter the name of a file to test POST request on : <input id="file_post" >
-		<button onclick="testPOST('file_post')">Submit using POST</button>
+		Enter the content to add : <input id="content_post" >
+		<button onclick="testPOST('file_post', 'content_post')">Submit using POST</button>
 
         <h2>HEAD</h2>
         Enter the name of a file to test HEAD request on : <input id="file_head" >
@@ -23,7 +24,8 @@
         
         <h2>PUT</h2>
         Enter the name  of a file to test PUT request on : <input id="file_put" >
-		<button onclick="testPUT('file_put')">Submit using PUT</button>
+        Enter the content to add : <input id="content_put" >
+		<button onclick="testPUT('file_put', 'content_put')">Submit using PUT</button>
 
 
         <script>
@@ -53,11 +55,12 @@
             }
             
             
-            testPUT = function(entry) {
-                let url = document.getElementById(entry).value;
+            testPUT = function(file, content) {
+                let url = document.getElementById(file).value;
+                let text = document.getElementById(content).value;
                 let xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("PUT", url, false); 
-                xmlhttp.send("This is a new message to replace the old file content\r\n"); 
+                xmlhttp.send(text); 
                 xmlhttp.onreadystatechange=function() {
                     if(xmlhttp.readyState==4) { 
                         console.log(xmlhttp.getAllResponseHeaders());
@@ -65,11 +68,12 @@
                 }
             }
             
-            testPOST = function(entry) {
-				let url = document.getElementById(entry).value;
+            testPOST = function(file, content) {
+				let url = document.getElementById(file).value;
+				let text = document.getElementById(content).value;
                 let xmlhttp = new XMLHttpRequest();
                 xmlhttp.open("POST", url, true); 
-                xmlhttp.send("This is a new message to add at the end of the file.\r\n"); 
+                xmlhttp.send(text); 
                 xmlhttp.onreadystatechange=function() {
 	                if(xmlhttp.readyState==4) { 
 	                    console.log(xmlhttp.getAllResponseHeaders());
