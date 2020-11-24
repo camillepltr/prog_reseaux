@@ -25,21 +25,22 @@
         Enter the name  of a file to test PUT request on : <input id="file_put" >
 		<button onclick="testPUT('file_put')">Submit using PUT</button>
 
-        <script>
 
+        <script>
             testHEAD = function(entry) {
-                let url = document.getElementById(entry).value;
-                let xmlhttp = new XMLHttpRequest();
-                xmlhttp.open("HEAD", url, true); 
-                xmlhttp.send(null); 
-                xmlhttp.onreadystatechange=function() {
-                    if(xmlhttp.readyState==4) { 
-                        console.log(xmlhttp.getAllResponseHeaders());
-                    }
-                }
+            	let url = document.getElementById(entry).value;
+            	let xmlhttp = new XMLHttpRequest();
+            	xmlhttp.open("HEAD", url, true);
+            	xmlhttp.send(null);
+            	xmlhttp.onreadystatechange=function() {
+            		if(xmlhttp.readyState==4) {
+            			console.log(xmlhttp.getAllResponseHeaders());
+            		}
+            	}
             }
 
             testDELETE = function(entry) {
+            
                 let url = document.getElementById(entry).value;
                 console.log(url);
                 let xmlhttp = new XMLHttpRequest();
@@ -51,7 +52,8 @@
                     }
                 }
             }
-
+            
+            
             testPUT = function(entry) {
                 let url = document.getElementById(entry).value;
                 let xmlhttp = new XMLHttpRequest();

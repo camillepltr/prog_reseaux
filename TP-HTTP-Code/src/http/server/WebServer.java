@@ -26,6 +26,30 @@ public class WebServer {
 	  private static final String BAD_REQUEST = "doc/Error_Pages/400_Bad_Request.html";
 	  private static final String NOT_FOUND = "doc/Error_Pages/404_Not_Found.html";
 	  private static final String INTERNAL_ERROR = "doc/Error_Pages/500_Internal_Error.html";
+	  private String resourcesDirectory;
+	  
+	  /**
+	   * Start the application.
+	   * @param args Command line's arguments, the first argument is the server port
+	   */
+	  public static void main(String args[]) {
+		  	if (args.length != 2) {
+			   System.out.println("Usage: java WebServer <Server port> <Path to resources>, i.e. java WebServer 3000 doc");
+			   System.exit(1);
+		  	}
+		  	
+		  	int serverPort = Integer.parseInt(args[0]);
+		    WebServer ws = new WebServer(args[1]);
+		    ws.start(serverPort);
+	  }
+	  
+	  /**
+	   * Constructor
+	   * @param d the path to the resources directory
+	   */
+	  public WebServer(String d) {
+		  this.resourcesDirectory = d;
+	  }
 
 	  /**
 	   * Creates a socket and waits for connection.
@@ -54,8 +78,9 @@ public class WebServer {
 		          // Remote is now the connected socket
 		          System.out.println("\r\nConnection, sending data.");
 		          BufferedReader in = new BufferedReader(new InputStreamReader(remote.getInputStream()));
-		          //BufferedOutputStream out = new BufferedOutputStream(remote.getOutputStream());
-		          PrintWriter out = new PrintWriter(remote.getOutputStream());
+		          PrintWriter outStream = new PrintWriter(remote.getOutputStream());
+		          BufferedOutputStream bytesOut = new BufferedOutputStream(remote.getOutputStream());
+		          OutputStream out = remote.getOutputStream();
 
 		          String requestHeader ="";
 		          // Le header fini par \r\n\r\n (CR LF CR LF)
@@ -86,37 +111,40 @@ public class WebServer {
 			          switch(requestHeaderSplit[0]) {
 			          		case "GET" :
 								System.out.println("GET request received");
-								requestGET(out, "doc"+requestHeaderSplit[1]);
+								requestGET(out, resourcesDirectory+requestHeaderSplit[1]);
 						        break;
 						        
 							case "POST" :
 								System.out.println("POST request received");
 								requestBody = getRequestBody(in);
-								requestPOST(out, "doc"+requestHeaderSplit[1], requestBody);
+								requestPOST(out, resourcesDirectory+requestHeaderSplit[1], requestBody);
 								break;
 								
 							case "HEAD" :
 								System.out.println("HEAD request received");
-								requestHEAD(out, "doc"+requestHeaderSplit[1]);
+								requestHEAD(out, resourcesDirectory+requestHeaderSplit[1]);
 								break;
 								
 							case "PUT" :
 								System.out.println("PUT request received");
 								requestBody = getRequestBody(in);
-								requestPUT(out, "doc"+requestHeaderSplit[1], requestBody);
+								requestPUT(out, resourcesDirectory+requestHeaderSplit[1], requestBody);
 								break;
 								
 							case "DELETE" :
 								System.out.println("DELETE request received");
-								requestDELETE(out, "doc"+requestHeaderSplit[1]);
+								requestDELETE(out, resourcesDirectory+requestHeaderSplit[1]);
 								break;
 								
 					        default : 
-					        	sendHeader(out, "501 Not Implemented", "doc"+requestHeaderSplit[1]);
+					        	sendHeader(out, "501 Not Implemented", resourcesDirectory+requestHeaderSplit[1]);
 					        	out.flush();
 					        	break;
 			          };
 				  }
+		          in.close();
+		          out.close();
+		          bytesOut.close();
 		          remote.close();
 		      } catch (Exception e) {
 		          System.out.println("Error: " + e);
@@ -143,10 +171,12 @@ public class WebServer {
 	  }
 	  
 	  /**
-	   * Read a local file
+	   * Read a local file (text file
 	   * @param filePath the filepath to the file to read
 	   * @return an array of strings representing the content of the file
+	   * @deprecated
 	   */
+	  @Deprecated
 	  private ArrayList<String> readFile(String filePath) {
 		  ArrayList<String> content = new ArrayList<String>();
 
@@ -163,12 +193,32 @@ public class WebServer {
 		  }
 		  
 	  }
+	  
+	  private byte[] readFile(String filePath, int size) throws IOException{
+		  byte[] image = new byte[size];
+          FileInputStream fileIn = null;
+
+          try {
+        	  File file = new File(filePath);
+              fileIn = new FileInputStream(file);
+              fileIn.read(image);
+          } finally {
+              if (fileIn != null) 
+                  fileIn.close();
+          }
+
+		  return image;
+		  
+	  }
+	  
 
 	  /**
 	   * Send the body, i.e. write the body's content in the output stream
 	   * @param out the PrintWriter to write in
 	   * @param content an array containt the Strings to write
+	   * @deprecated
 	   */
+	  @Deprecated
 	  private void sendBody(PrintWriter out, ArrayList<String> content) {
 			if(content != null) {
 				for(String line : content) {
@@ -178,46 +228,43 @@ public class WebServer {
 			}
 		}
 	  
-	  /*private void requestGET(BufferedOutputStream out, String filePath){
-	        long size = -1;
-	      
-	        try {
-	        	//BufferedInputStream inFile = new BufferedInputStream(new FileInputStream(filePath));
-	            // Send the response's body
-	  		  	byte[] cbuf = new byte[1000];
-	  		  	ArrayList<byte[]> readBuffers = new ArrayList<byte[]>();
-	  		  	int numberReadBytes = 0;
 
-	  		  	while (numberReadBytes > -1) {
-	  		  		numberReadBytes = inFile.read(cbuf);
-	  		  		readBuffers.add(cbuf);
-	  		  		size += numberReadBytes;
-	  		  	}
-	  		  	// Send the response's header
-	            sendHeader(out, size+1, "200 OK", filePath);
-	            for(byte[] rb : readBuffers) {
-	            	//out.write(rb);
-	            }
-	            out.flush();
-	            inFile.close();
-	        } catch (Exception e) {
-	            System.err.println("Error in WebServer while loading ressource:" + e);
-	        }
-            
-            System.out.println("Response to GET : data sent");
-	  }*/
+	  private void sendBody(OutputStream bytesOut, byte[]content) {
+		  try{
+			  bytesOut.write(content, 0, content.length);
+			  bytesOut.flush();
+		  } catch(Exception e) {
+			  System.err.println("Error in WebServer while sending bytes" + e);
+		  }
+		  
+	  }
+	  
+	  private void sendError(OutputStream out, String status, String filePath) {
+		  try {
+			  Path p = Paths.get(filePath);
+			  long size = Files.size(p);
+			  byte[] content = readFile(filePath, (int)size);
+			  sendHeader(out, status, filePath);
+	      	  sendBody(out, content);
+	          System.err.println("Error in WebServer");
+		  } catch (Exception e) {
+			  e.printStackTrace();
+		  }
+
+	  }
+	  
 	  
 		/**
 		 * Method called to treat a HTTP GET request
 		 * @param out the PrintWriter to write the response to
 		 * @param filePath the file path to the requested file
 		 */
-		  private void requestGET(PrintWriter out, String filePath) {
+		  private void requestGET(OutputStream out, String filePath) {
 			  	//initial path and status
 				Path path = Paths.get(filePath);
 				String status = "200 OK";
-		      
 		        try {
+		        	
 		        	if (!Files.exists(path)) {
 		        		//Change the path to send the 404_Not_Found page and change status code
 		        		path = Paths.get(NOT_FOUND);
@@ -225,18 +272,15 @@ public class WebServer {
 		        		status = "404 Not Found";
 					}
 		        	
-		        	//Read requested file, send response header and body
-		        	ArrayList<String> content = readFile(filePath);
-		  		    sendHeader(out, Files.size(path), status, filePath);
-		        	sendBody(out, content);
-	
+		        	long size = Files.size(path);
+	        		byte [] bytesRead = readFile(filePath, (int)size);
+	        		sendHeader(out, size, status, filePath);
+	        		sendBody(out, bytesRead);
+		
 		 	        System.out.println("Response to GET : data sent");
 		        } catch (Exception e) {
 		        	//Send 500_Internal_Error page
-					ArrayList<String> content = readFile(INTERNAL_ERROR);
-		  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-		        	sendBody(out, content);
-		            System.err.println("Error in WebServer while loading ressource:" + e);
+					sendError(out, "500 Internal Error", INTERNAL_ERROR);
 		        }
 		  }
 		  
@@ -246,12 +290,13 @@ public class WebServer {
 		   * @param filePath the path to the requested file
 		   * @param requestBody a String representation of the request's body, needed to trea the POST request
 		   */
-		  private void requestPOST(PrintWriter out, String filePath, String requestBody) {
+		  private void requestPOST(OutputStream out, String filePath, String requestBody) {
 			  try {
 				  Path path = Paths.get(filePath);
 				  	if (requestBody.isEmpty()) {
 				  		//If there is nothing in the request's body, send a BAD REQUEST response
-				  		ArrayList<String> content = readFile(BAD_REQUEST);
+				  		long size = Files.size(path);
+				  		byte[] content = readFile(BAD_REQUEST, (int)size);
 			  		    sendHeader(out, "400 Bad Request", BAD_REQUEST);
 			        	sendBody(out, content);
 				  		return;
@@ -271,10 +316,7 @@ public class WebServer {
 					System.out.println("Response to POST : data sent");
 				} catch (Exception e) {
 					//Send 500_Internal_Error page
-					ArrayList<String> content = readFile(INTERNAL_ERROR);
-		  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-		        	sendBody(out, content);
-					System.err.println("Error in WebServer while posting ressource:" + e);
+					sendError(out, "500 Internal Error", INTERNAL_ERROR);
 				}
 		  }
 	  
@@ -283,7 +325,7 @@ public class WebServer {
 	   * @param out the PrintWriter to write the response to
 	   * @param filePath the file path to the requested file
 	   */
-	  private void requestHEAD(PrintWriter out, String filePath) {
+	  private void requestHEAD(OutputStream out, String filePath) {
 		  	//initial path and status
 		    Path path = Paths.get(filePath);
 			String status = "200 OK";
@@ -291,23 +333,20 @@ public class WebServer {
 	        try {
 	        	if (!Files.exists(path)) {
 	        		//Change the path to send the 404_Not_Found page and change status code
-	        		path = Paths.get(NOT_FOUND);
-	        		filePath = NOT_FOUND;
-	        		status = "404 Not Found";
+					sendError(out, "404 Not Found", NOT_FOUND);
+					return;
 				}
 	        	
 	        	//Read requested file, send response header
-	        	ArrayList<String> content = readFile(filePath);
-	  		    sendHeader(out, Files.size(path), status, filePath);
+	        	long size = Files.size(path);
+	        	byte[] content = readFile(filePath, (int)size);
+	  		    sendHeader(out, size, status, filePath);
 	  		    out.flush();
 
 	 	        System.out.println("Response to HEAD : data sent");
 	        } catch (Exception e) {
 	        	//Send 500_Internal_Error page
-				ArrayList<String> content = readFile(INTERNAL_ERROR);
-	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-	        	sendBody(out, content);
-	            System.err.println("Error in WebServer while loading ressource:" + e);
+	        	sendError(out, "500 Internal Error", INTERNAL_ERROR);
 	        }
 
 	  }
@@ -318,16 +357,14 @@ public class WebServer {
 	   * @param filePath the path to the requested file
 	   * @param requestBody a String representation of the request's body, needed to treat the PUT request
 	   */
-	  private void requestPUT(PrintWriter out, String filePath, String requestBody) {
+	  private void requestPUT(OutputStream out, String filePath, String requestBody) {
 		  
 		  try {
 			    Path path = Paths.get(filePath);
 			    String status = "200 OK";
 			  	if (requestBody.isEmpty()) {
 			  		//If there is nothing in the request's body, send a BAD REQUEST response
-			  		ArrayList<String> content = readFile(BAD_REQUEST);
-		  		    sendHeader(out, "400 Bad Request", BAD_REQUEST);
-		        	sendBody(out, content);
+			  		sendError(out, "400 Bad Request", BAD_REQUEST);
 			  		return;
 			  	}
 
@@ -345,10 +382,7 @@ public class WebServer {
 				System.out.println("Response to PUT : data sent");
 			} catch (Exception e) {
 				//Send 500_Internal_Error page
-				ArrayList<String> content = readFile(INTERNAL_ERROR);
-	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-	        	sendBody(out, content);
-				System.err.println("Error in WebServer while puting ressource:" + e);
+				sendError(out, "500 Internal Error", INTERNAL_ERROR);
 			}
 	  }
 	  
@@ -357,7 +391,7 @@ public class WebServer {
 	   * @param out the PrintWriter to write the response to
 	   * @param filePath the file path to the requested file
 	   */
-	  private void requestDELETE(PrintWriter out, String filePath) {
+	  private void requestDELETE(OutputStream out, String filePath) {
 		  try {
 
 				System.out.println("DELETE request received");
@@ -377,17 +411,13 @@ public class WebServer {
 					out.flush();
 				} else if (!existed) {
 					//Case where the requested file does not exist
-					ArrayList<String> content = readFile(NOT_FOUND);
-		  		    sendHeader(out, "404 Not Found", NOT_FOUND);
-		        	sendBody(out, content);
+					sendError(out, "404 Not Found", NOT_FOUND);
+					return;
 				} 
 				System.out.println("Response to DELETE : data sent");
 			} catch (Exception e) {
 				//Send 500_Internal_Error page
-				ArrayList<String> content = readFile(INTERNAL_ERROR);
-	  		    sendHeader(out, "500 Internal Server Error", INTERNAL_ERROR);
-	        	sendBody(out, content);
-				System.err.println("Error in WebServer while deleting ressource:" + e);
+				sendError(out, "500 Internal Error", INTERNAL_ERROR);
 			}
 	  }
 	  
@@ -436,8 +466,7 @@ public class WebServer {
 	   * @param responseStatus response's status according to the HTTP Protocol
 	   * @param filePath a String reprentation of the path to the requested file
 	   */
-	  //private void sendHeader(BufferedOutputStream out, long size, String responseStatus, String filePath){
-	  private void sendHeader(PrintWriter out, long size, String responseStatus, String filePath){
+	  private void sendHeader(OutputStream out, long size, String responseStatus, String filePath){
 		  String type = getContentType(filePath);
 		  String header = "HTTP/1.0 " + responseStatus + "\r\n";
 		  header += "Content-Type: "+type+"; charset=UTF-8\r\n";
@@ -447,7 +476,7 @@ public class WebServer {
 		  header += "\r\n";
 		  System.out.println(header);
 		  try {
-			  out.println(header);
+			  out.write(header.getBytes());
 		  } catch (Exception e) {
 			  System.err.println("Error while sending the Header : "+e);
 		  }
@@ -460,8 +489,7 @@ public class WebServer {
 	   * @param responseStatus response's status according to the HTTP Protocol
 	   * @param filePath a String reprentation of the path to the requested file
 	   */
-	  //private void sendHeader(BufferedOutputStream out, String responseStatus, String filePath){
-	  private void sendHeader(PrintWriter out, String responseStatus, String filePath) {
+	  private void sendHeader(OutputStream out, String responseStatus, String filePath) {
 		  String type = getContentType(filePath);
 		  String header = "HTTP/1.0 " + responseStatus +"\r\n";
 		  header += "Content-Type: "+type+"; charset=UTF-8\r\n";
@@ -470,24 +498,11 @@ public class WebServer {
 		  header += "\r\n";
 		  System.out.println(header);
 		  try {
-			  out.println(header);
+			  out.write(header.getBytes());
 		  } catch (Exception e) {
 			  System.err.println("Error while sending the Heade : "+e);
 		  }
 	  }
 	  
-	  /**
-	   * Start the application.
-	   * @param args Command line's arguments, the first argument is the server port
-	   */
-	  public static void main(String args[]) {
-		  	if (args.length != 1) {
-			   System.out.println("Usage: java WebServer <Server port>, i.e. java WebServer 3000");
-			   System.exit(1);
-		  	}
-		  	
-		  	int serverPort = Integer.parseInt(args[0]);
-		    WebServer ws = new WebServer();
-		    ws.start(serverPort);
-	  }
+
 }
