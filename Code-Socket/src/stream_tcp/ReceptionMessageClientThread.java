@@ -22,6 +22,7 @@ public class ReceptionMessageClientThread extends Thread {
 	 * Constructor
 	 * @param initialSocket the client's socket 
 	 * @param initialConversation JTextArea containing every messages sent to the group
+	 * @param INITIAL_PSEUDO Client's Pseudonym
 	 */
 	ReceptionMessageClientThread(Socket initialSocket, final String INITIAL_PSEUDO, JTextArea initialConversation) {
 		this.PSEUDO = INITIAL_PSEUDO;

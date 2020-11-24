@@ -23,7 +23,7 @@ public class ReceptionMessageClientThread extends Thread {
      * Constructor
      * @param initialSocket client's socket 
      * @param INITIAL_PSEUDO client's pseudonym 
-     * @param INITIAL_GROUP_ADDRESS client's group IP address
+     * @param conv JTextArea where the conversion is displayed
      */
 	ReceptionMessageClientThread(MulticastSocket initialSocket, final String INITIAL_PSEUDO, JTextArea conv) {
 		this.clientSocket = initialSocket;

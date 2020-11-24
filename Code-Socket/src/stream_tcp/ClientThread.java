@@ -61,6 +61,7 @@ public class ClientThread extends Thread {
     /**
      * Removes the client's stream from the list of output streams of the server and
      * Sends to the client a disconnection message.
+     * @param socOut PrintStream connected to the socket's output  
      * */
     private void quitConversation(PrintStream socOut){
         ClientThread.socketOuts.remove(socOut);
@@ -69,6 +70,7 @@ public class ClientThread extends Thread {
     
     /**
      * Sends a received message to every connected clients
+     * @param message Message to send
      * */
     private void sendMessage(String message){
     	System.out.println("Message client "+clientSocket.getInetAddress()+" : "+message);

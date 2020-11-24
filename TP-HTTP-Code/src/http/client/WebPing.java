@@ -14,7 +14,7 @@ import java.net.Socket;
  *  - then the server port number
  * If the application is started with less or more than two parameters, it stops.
  * @author Camille Peltier, Camélia Guerraoui
- * @see WebServer
+ * @see http.server.WebServer
  */
 public class WebPing {
 

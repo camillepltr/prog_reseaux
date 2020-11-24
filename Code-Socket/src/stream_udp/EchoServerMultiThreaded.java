@@ -54,8 +54,8 @@ public class EchoServerMultiThreaded  {
      * @param SAVED_FILE_NAME path to the file used to store the messages
      * @param SERVER_PORT server's port number
      * @return the remote object History containing every saved messages
-     * @throws RemoteException
-     * @throws AlreadyBoundException
+     * @throws RemoteException Signals an exception which occurred during the execution of a remote method call
+     * @throws AlreadyBoundException Thrown if an attempt is made to bind an object in the registry to a name that already has an associated binding.
      */
     private static History createHistory(final String SAVED_FILE_NAME,
     									 final int SERVER_PORT) throws RemoteException, AlreadyBoundException {
@@ -72,7 +72,7 @@ public class EchoServerMultiThreaded  {
      * @param history remote object containing the history
      * @param serverSocket Server's MulticastSocket 
      * @param GROUP_ADDRESS IP address of the group
-     * @throws IOException
+     * @throws IOException Signals that exceptions produced by failed or interrupted I/O operation happened.
      */
     private static void transmitMessages (History history, MulticastSocket serverSocket,
     									  InetAddress GROUP_ADDRESS) throws IOException {

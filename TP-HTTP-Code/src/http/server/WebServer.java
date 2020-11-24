@@ -59,6 +59,7 @@ public class WebServer {
 	   * When a client send a request of connection, the server accepts it. 
 	   * The server reads the data sent and stops reading once a blank line is hit. 
 	   * This blank line siganls the end of the client HTTP Headers
+	   * @param serverPort Port Number of the web server
 	   */
 	  protected void start(int serverPort) {
 		  ServerSocket s;
@@ -140,6 +141,7 @@ public class WebServer {
 
 	  /**
 	   * Read the Request's Header. 
+	   * @param in BufferedReader connected to the server's socket.
 	   * @return the Request's Header
 	   * @throws IOException Signals that an I/O exception of some sort has occurred.
 	   * 			This class is the general class of exceptions produced by failed or interrupted I/O operations.
@@ -243,7 +245,7 @@ public class WebServer {
 	   * @param out socket's output i.e. the stream where the data should be sent
 	   * @param size content length
 	   * @param responseStatus response's status according to the HTTP Protocol
-	   * @param filePath a String reprentation of the path to the requested file
+	   * @param type a String representation the Content type of the resource
 	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
 	   */
 	  private void sendHeader(OutputStream out, long size, String responseStatus, String type) throws IOException{
@@ -262,7 +264,6 @@ public class WebServer {
 	   * Second sendHeader method, when there is no content length to add to the header
 	   * @param out socket's output i.e. the stream where the data should be sent
 	   * @param responseStatus response's status according to the HTTP Protocol
-	   * @param filePath a String reprentation of the path to the requested file
 	   * @throws IOException Signals that the output stream out couldn't write (failed or interrupted Output operations).
 	   */
 	  private void sendHeader(OutputStream out, String responseStatus) throws IOException{
