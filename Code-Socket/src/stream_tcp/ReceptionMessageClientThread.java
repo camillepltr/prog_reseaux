@@ -47,7 +47,7 @@ public class ReceptionMessageClientThread extends Thread {
 
     		//After disconnection, close the streams and terminate program
             clientSocketIn.close();
-            clientSocket.close();
+            //clientSocket.close();
             System.exit(0);
 
     	} catch (Exception e) {

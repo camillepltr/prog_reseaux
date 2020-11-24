@@ -31,7 +31,6 @@ public class EchoServerMultiThreaded  {
         
         System.out.println("Server Launched");
         
-        /*
         if (args.length != 2) {
             System.out.println("Usage: java EchoSererMultiThreaded <Port> <Group>, i.e. java EchoServerMultiThreaded 3500 228.5.6.7");
             System.exit(1);
@@ -39,16 +38,13 @@ public class EchoServerMultiThreaded  {
         // Server's Parameters 
         final int SERVER_PORT = new Integer(args[0]).intValue(); 
         final String GROUP_NAME = args[1]; 
-        */
-
-        //Parameters
-        final int SERVER_PORT = 3500;
-        final String SAVED_FILE_NAME = "src/stream_udp/savedHistory.txt";
-        final String GROUP_NAME = "228.5.6.7";
-
+        
         final InetAddress GROUP_ADDRESS = InetAddress.getByName(GROUP_NAME);
         MulticastSocket serverSocket = new MulticastSocket(SERVER_PORT);
-        
+
+        //Saved file's Parameters
+        final String SAVED_FILE_NAME = "src/stream_udp/savedHistory.txt";
+ 
         History h = createHistory(SAVED_FILE_NAME, SERVER_PORT);
         transmitMessages(h, serverSocket, GROUP_ADDRESS);
     }
