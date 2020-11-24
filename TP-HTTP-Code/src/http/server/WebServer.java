@@ -33,13 +33,14 @@ public class WebServer {
 	   * The server reads the data sent and stops reading once a blank line is hit. 
 	   * This blank line siganls the end of the client HTTP Headers
 	   */
-	  protected void start() {
+	  protected void start(int serverPort) {
 		  ServerSocket s;
 	
-		  System.out.println("Webserver starting up on port 3000");
+		  
 
 		  try {
-			  s = new ServerSocket(3000);
+			  s = new ServerSocket(serverPort);
+			  System.out.println("Webserver starting up on port " + serverPort);
 		  } catch (Exception e) {
 			  System.out.println("Error: " + e);
 			  return;
@@ -477,10 +478,16 @@ public class WebServer {
 	  
 	  /**
 	   * Start the application.
-	   * @param args Command line parameters are not used.
+	   * @param args Command line's first argument is the server port
 	   */
 	  public static void main(String args[]) {
+		  	if (args.length != 1) {
+			   System.out.println("Usage: java WebServer <Server port>, i.e. java WebServer 3000");
+			   System.exit(1);
+		  	}
+		  	
+		  	int serverPort = Integer.parseInt(args[0]);
 		    WebServer ws = new WebServer();
-		    ws.start();
+		    ws.start(serverPort);
 	  }
 }
