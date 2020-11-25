@@ -301,7 +301,7 @@ public class WebServer {
 			  String type = getContentType(filePath);
 			  sendHeader(out, size, status, type);
 	      	  sendBody(out, content);
-	          System.err.println("Error in WebServer");
+	          System.err.println("Error in WebServer : "+status);
 		  } catch (Exception e) {
 			  e.printStackTrace();
 		  }

@@ -46,9 +46,9 @@ public class ReceptionMessageClientThread extends Thread {
                 conversation.append(line + "\n");
     		}
 
-    		//After disconnection, close the streams and terminate program
-            clientSocketIn.close();
-            //clientSocket.close();
+    		//After disconnection, close the input stream and terminate program
+            clientSocket.shutdownInput();
+            clientSocket.close();
             System.exit(0);
 
     	} catch (Exception e) {

@@ -93,6 +93,12 @@ public class ClientInterface  extends JFrame implements ActionListener{
 	private void disconnect() {
 		clientSocketOut.println(this.PSEUDO+" left.");
 		clientSocketOut.println("quit");
+		//After disconnection, close the output stream
+		try {
+			clientSocket.shutdownOutput();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void initializeJFrameWindow() {

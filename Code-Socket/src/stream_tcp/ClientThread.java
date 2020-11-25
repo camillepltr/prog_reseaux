@@ -52,7 +52,9 @@ public class ClientThread extends Thread {
     				  this.sendMessage(message);
     			  }
     		  }
+    		  socIn.close();
     		  socOut.close();
+    		  clientSocket.close();
     	  } catch (Exception e) {
     		  System.err.println("Error in ClientThread:" + e); 
     	  }
